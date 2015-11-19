@@ -70,10 +70,6 @@ void analyzeChiralityXYZ(xyzfile& snap, const Box& box){
 }
 
 
-
-
-
-
 int main(int argc, const char * argv[]) {
     // insert code here...
     std::cout << "Hello, World!\n";
@@ -98,13 +94,21 @@ int main(int argc, const char * argv[]) {
     typematch[1] = "2"; typematch[2] = "3";
 
     for (unsigned int i=0; i<traj.size(); i++){
-	analyzeChiralityXYZ(traj[i],box);
-	for (unsigned int j=0; j<3; j++){
-		typecount[j] = std::count(traj[i].type.begin(),traj[i].type.end(),typematch[j]);
-		typecountmax[j] = std::max(typecount[j],typecountmax[j]);
-	}
+        analyzeChiralityXYZ(traj[i],box);
+        for (unsigned int j=0; j<3; j++){
+            typecount[j] = (int) std::count(traj[i].type.begin(),traj[i].type.end(),typematch[j]);
+            typecountmax[j] = std::max(typecount[j],typecountmax[j]);
+        }
     }
-    //savexyz(filename1, traj);    
+    typelog_t logtypes;
+    for (unsigned int i=0; i<typematch.size(); i++) logtypes[typematch[i]] = typecountmax[i];
+    VisualizerXYZ chiral(filename1);
+    chiral.setTypeMax(logtypes);
+    chiral.visualize(traj);
+    
+    
+    
+//    savexyz(filename1, traj);
     std::cout << typecountmax[0] << "\t" << typecountmax[1] << "\t" << typecountmax[2] << "\n"; 
  
    

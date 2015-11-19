@@ -14,6 +14,8 @@
 #include "order_parameter.hpp"
 #include "io.hpp"
 #include "spatial.hpp"
+#include "visualizer.hpp"
+#include "visualizer_xyz.hpp"
 
 
 #endif /* trajectoryAnalysis_h */

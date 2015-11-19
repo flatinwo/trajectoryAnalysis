@@ -36,6 +36,9 @@ namespace trajectoryAnalysis {
     typedef void* arg_t;
     
     
+    typedef std::map<std::string, unsigned int> typelog_t;
+    
+    
     struct Box{
         
         Box():
