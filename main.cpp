@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <algorithm>
 
 #include "trajectoryAnalysis.h"
 
@@ -69,44 +70,44 @@ void analyzeChiralityXYZ(xyzfile& snap, const Box& box){
 }
 
 
+
+
+
+
 int main(int argc, const char * argv[]) {
     // insert code here...
     std::cout << "Hello, World!\n";
     
     xyzfile data;
     Box box;
-    box.box_hi[0] = 30.6910;
-    box.box_hi[1] = 30.6910;
-    box.box_hi[2] = 30.6910;
+    box.box_hi[0] = atof(argv[3]);
+    box.box_hi[1] = atof(argv[4]);
+    box.box_hi[2] = atof(argv[5]);
     box.updatePeriod();
 
-    
+   
+    const char* filename0 = argv[1];
+    const char* filename1 = argv[2];
+
+
     xyztrajectory_t traj;
-    loadxyz("/Users/Folarin/Documents/vmd_views/chirality/dumpfinal3_4.xyz", traj);
-    savexyz("/Users/Folarin/Documents/vmd_views/chirality/dumpfinal3_4_done.xyz", traj);
+    loadxyz(filename0, traj);
     
-    
-    loadxyz("//Users/Folarin/Documents/vmd_views/chirality/dumpfinal4.xyz", data);
-    analyzeChiralityXYZ(data, box);
-    savexyz("//Users/Folarin/Documents/vmd_views/chirality/dumpfinal4process.xyz", data);
-    
-    
-    
-    /*
-    trajectoryAnalysis::trajectory_t A;
-    trajectoryAnalysis::loadxyz("/Users/Folarin/Documents/vmd_views/water/patchy_colloids/test_snaps/confined/NVT_ensemble_T=0.09_density=0.1542.xyz", A);
-     */
-    
-    //trajectoryAnalysis::Trajectory A("/Users/Folarin/Documents/vmd_views/water/patchy_colloids/test_snaps/confined/NVT_ensemble_T=0.09_density=0.1542.xyz");
-    
-    //trajectoryAnalysis::OrderParameter B("/Users/Folarin/Library/Developer/Xcode/DerivedData/Build/Products/Debug/log_energy_NVT_T=0.07099_density0.07984.txt");
-    
-    //B.computeAutoCorrelation();
-    
-    /*trajectoryAnalysis::Trajectory trajA("/Users/Folarin/Documents/vmd_views/water/patchy_colloids/test_snaps/confined/NVT_ensemble_T=0.09_density=0.1542.xyz");
-    trajA.computeMeanSquaredDisplacement();
-    std::cout << trajA << "\n";*/
-    
+    std::vector<unsigned int> typecount(3,0), typecountmax(3,0);
+    std::vector<std::string> typematch(3,"1");
+    typematch[1] = "2"; typematch[2] = "3";
+
+    for (unsigned int i=0; i<traj.size(); i++){
+	analyzeChiralityXYZ(traj[i],box);
+	for (unsigned int j=0; j<3; j++){
+		typecount[j] = std::count(traj[i].type.begin(),traj[i].type.end(),typematch[j]);
+		typecountmax[j] = std::max(typecount[j],typecountmax[j]);
+	}
+    }
+    //savexyz(filename1, traj);    
+    std::cout << typecountmax[0] << "\t" << typecountmax[1] << "\t" << typecountmax[2] << "\n"; 
+ 
+   
     
     
     

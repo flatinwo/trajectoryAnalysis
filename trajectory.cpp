@@ -20,7 +20,10 @@ namespace trajectoryAnalysis {
     }
     
     //constructor 2
-    Trajectory::Trajectory(const char* filename): Trajectory(){
+    Trajectory::Trajectory(const char* filename){
+
+	_time_step = 100; _unfolded = false; maxCorrelationLength=0;
+
         //load trajectory
         loadxyz(filename, _trajectory);
         
