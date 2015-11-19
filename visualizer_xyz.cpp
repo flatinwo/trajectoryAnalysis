@@ -32,8 +32,7 @@ namespace trajectoryAnalysis {
             n += it->second;
     
         std::cout << "Total number of types is\t" << n << "\n";
-        
-        
+
         
         for (unsigned int i=0; i<xyztraj.size(); i++) {
             xyz_info info;
@@ -41,15 +40,18 @@ namespace trajectoryAnalysis {
             unsigned int nmax = (unsigned int) xyztraj[i].x.size();
             _os << n << "\n\n";
             
-            unsigned int j,k;
             for (typelog_t::iterator it=_typemax.begin(); it!=_typemax.end(); ++it) {
-                for (j=0,k=0; j< it->second || k < nmax ; j++) {
-                    if (info.type[k++] == it->first) {
-                        _os << info.type[k-1] << "\t" << xyztraj[i].x[k-1] << "\n";
+                unsigned int npad = it->second;
+                for (unsigned int j=0; j < nmax ; j++) {
+                    if (info.type[j] == it->first) {
+                        _os << info.type[j] << "\t" << xyztraj[i].x[j] << "\n";
+                        npad--;
                     }
-                    else
-                        _os << it->first << "\t0\t0\t-1\n";
                 }
+                for (unsigned int j=0; j<npad; j++) {
+                     _os << it->first << "\t0\t0\t0\n";
+                }
+
             }
 
         }
