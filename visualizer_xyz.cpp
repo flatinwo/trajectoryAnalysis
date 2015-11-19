@@ -38,14 +38,14 @@ namespace trajectoryAnalysis {
         for (unsigned int i=0; i<xyztraj.size(); i++) {
             xyz_info info;
             info.type = xyztraj[i].type;
+            unsigned int nmax = (unsigned int) xyztraj[i].x.size();
             _os << n << "\n\n";
             
             unsigned int j,k;
             for (typelog_t::iterator it=_typemax.begin(); it!=_typemax.end(); ++it) {
-                for (j=0,k=0; j< it->second || k < it->second ; j++) {
-                    if (info.type[j] == it->first) {
-                        _os << info.type[j] << "\t" << xyztraj[i].x[j] << "\n";
-                        k++;
+                for (j=0,k=0; j< it->second || k < nmax ; j++) {
+                    if (info.type[k++] == it->first) {
+                        _os << info.type[k-1] << "\t" << xyztraj[i].x[k-1] << "\n";
                     }
                     else
                         _os << it->first << "\t0\t0\t-1\n";
