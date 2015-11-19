@@ -10,5 +10,23 @@
 #define visualizer_xyz_hpp
 
 #include <stdio.h>
+#include "visualizer.hpp"
+#include <fstream>
+
+namespace trajectoryAnalysis {
+    class VisualizerXYZ : public Visualizer{
+    public:
+        VisualizerXYZ(const char*);
+        ~VisualizerXYZ();
+        
+        void setTypeMax(typelog_t& typemax);
+        void visualize(xyztrajectory_t& traj);
+        
+    protected:
+        std::ofstream _os;
+        typelog_t _typemax;
+        
+    };
+}
 
 #endif /* visualizer_xyz_hpp */
