@@ -46,7 +46,7 @@ namespace trajectoryAnalysis {
                         _os << info.type[j] << "\t" << xyztraj[i].x[j] << "\n";
                     }
                     else
-                        _os << info.type[j] << "\t0\t0\t-1\n";
+                        _os << it->first << "\t0\t0\t-1\n";
                 }
             }
 
