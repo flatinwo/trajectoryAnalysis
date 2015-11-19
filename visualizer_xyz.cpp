@@ -40,10 +40,12 @@ namespace trajectoryAnalysis {
             info.type = xyztraj[i].type;
             _os << n << "\n\n";
             
+            unsigned int j,k;
             for (typelog_t::iterator it=_typemax.begin(); it!=_typemax.end(); ++it) {
-                for (unsigned int j=0; j< it->second; j++) {
+                for (j=0,k=0; j< it->second || k < it->second ; j++) {
                     if (info.type[j] == it->first) {
                         _os << info.type[j] << "\t" << xyztraj[i].x[j] << "\n";
+                        k++;
                     }
                     else
                         _os << it->first << "\t0\t0\t-1\n";
