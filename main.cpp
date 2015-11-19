@@ -19,7 +19,7 @@
 
 using namespace trajectoryAnalysis;
 
-std::string chirality(coord_list_t x, const Box& box){
+std::string chirality(coord_list_t& x, const Box& box){
     
     Box _box = box;
     assert(x.size() == 4);
@@ -48,6 +48,43 @@ std::string chirality(coord_list_t x, const Box& box){
 
 }
 
+std::string chiralityunwrap(coord_list_t& x, const Box& box){
+    
+    Box _box = box;
+    assert(x.size() == 4);
+    double_coord_t dr1 = distancesqandvec(x[1], x[0], _box);
+    x[1] = x[0] + dr1.second;
+    
+    
+    double_coord_t dr2 = distancesqandvec(x[2], x[1], _box);
+    x[2] = x[1] + dr2.second;
+    
+    
+    
+    double_coord_t dr3 = distancesqandvec(x[3], x[2], _box);
+    x[3] = x[2] + dr3.second;
+    
+    //compute zeta
+    double c1 = (dr2.second[1]*dr3.second[2] - dr2.second[2]*dr3.second[1]);
+    double c2 = (dr2.second[0]*dr3.second[2] - dr2.second[2]*dr3.second[0]);
+    double c3 = (dr2.second[0]*dr3.second[1] - dr2.second[1]*dr3.second[0]);
+    
+    double zeta = dr1.second[0]*c1 - dr1.second[1]*c2 + dr1.second[2]*c3;
+    zeta /= (sqrt(dr1.first*dr2.first*dr3.first));
+    
+    //std::cout << zeta <<"\n";
+    
+    if (zeta > 0.33) {
+        return "1";
+    }
+    else if (zeta < -0.33){
+        return "2";
+    }
+    else
+        return "3";
+    
+}
+
 void analyzeChiralityXYZ(xyzfile& snap, const Box& box){
     
     int natoms = snap.n;
@@ -61,7 +98,7 @@ void analyzeChiralityXYZ(xyzfile& snap, const Box& box){
         for (unsigned int j=0; j<4; j++) {
             x.push_back(snap.x[k++]);
         }
-        std::string zeta = chirality(x,box);
+        std::string zeta = chiralityunwrap(x,box);
         for (unsigned int j=0; j<4; j++) {
             snap.type[l++] = zeta;
         }

@@ -39,6 +39,17 @@ namespace trajectoryAnalysis {
     typedef std::map<std::string, unsigned int> typelog_t;
     
     
+    //overloaded operators
+    
+    inline coord_t operator+(const coord_t& x, const coord_t& y){
+        assert(x.size() == y.size());
+        coord_t z(x.size());
+        for (unsigned int i=0; i<x.size(); i++)
+            z[i] = x[i] + y[i];
+        return z;
+    }
+    
+    
     struct Box{
         
         Box():
