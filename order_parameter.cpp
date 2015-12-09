@@ -10,12 +10,28 @@
 #include "io.hpp"
 #include <cassert>
 
+
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/moment.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
+
+
 //try order-N algorithm in Allen & Tildesey or Frenkel & Smit book for autocorrelation
+//it may be worth it to data in consistent vector format, that is data[0] represents a given set
+//data[1] represents a given set, and so on....
+//an alternative would be to load using multidimensional library in boost
+//use R as library to CPP package
+
+using namespace boost::accumulators;
 
 namespace trajectoryAnalysis {
     
     OrderParameter::OrderParameter(const char* filename){
         load(filename, _data);
+        std::cout << "Size of data is\t" << _data.size() << "\t" << _data[0].size() << std::endl;
+        restructureData();
     }
     
     OrderParameter::OrderParameter(Trajectory& traj):_trajectory(&traj){
@@ -28,33 +44,75 @@ namespace trajectoryAnalysis {
 #pragma mark COMPUTES
     
     //brute force auto-correlation function
-    void OrderParameter::computeAutoCorrelation(){
-        assert(_data.size()>100);
-        assert(_data[0].size()>2);
+    void OrderParameter::computeAutoCorrelation(int index){
+        assert(_data.size()>index);
+        assert(_data[index].size()>100);
         
-        int dataSize = (int) _data.size();
+        int dataSize = (int) _data[index].size();
         
         corr_point_t zeros;
-        zeros.first = zeros.second = 0;
+        zeros.first = zeros.second = 0.;
         corr_point_list_t correlation((int) floor((double) dataSize/3), zeros);
         
-        for (unsigned int i=0; i<_data.size(); i++) {
-            for (unsigned int j=0; j<correlation.size(); j++) {
-                if (i+j >= _data.size())
+        //delete average from all data
+        std::transform(_data[index].begin(), _data[index].end(), _data[index].begin(), std::bind2nd(std::minus<double>(), _average));
+
+        for (unsigned int i=0; i<_data[index].size(); i++) {
+            for (unsigned int j=i; j<_data[index].size(); j++) {
+                if (j-i >= correlation.size())
                     continue;
-                correlation[j].second += _data[i][2]*_data[i+j][2];
-                correlation[j].first++;
+                correlation[j-i].second += _data[index][i]*_data[index][j];
+                correlation[j-i].first++;
             }
         }
         
-        _correlation.clear();
-        double normalization = (double) correlation[0].first / correlation[0].second;
+        
+        _correlation.clear();        
         
         for (auto it=correlation.begin(); it != correlation.end(); ++it) {
-            _correlation.push_back((it->second / (double) it->first)*normalization);
+            double corr = (it->second/(double) it->first)/_variance;
+            _correlation.push_back(corr);
         }
         
         
         assert(_correlation.size() == correlation.size());
+    }
+    
+    void OrderParameter::computeAverageAndVariance(int j){
+        accumulator_set<double, stats< tag::mean, tag::variance > > acc; //typede this
+        assert(j<_data.size());
+        
+        
+        for_each(_data[j].begin(), _data[j].end(), std::bind<void>(std::ref(acc), std::placeholders::_1)); //not copying by value
+        
+        _average = mean(acc);
+        _variance = boost::accumulators::variance(acc);
+        
+        std::cout << "Average is\t" << _average << std::endl;
+        std::cout << "Variance is\t" << _variance << std::endl;
+
+    }
+    
+    
+    void OrderParameter::printCorrelation(){
+        for (unsigned int i=0; i<_correlation.size(); i++)
+            std::cout << i << "\t" << _correlation[i] << std::endl;
+    }
+    
+    
+    
+    void OrderParameter::restructureData(){
+        coord_list_t new_data;
+        
+        for (unsigned int i=0; i<_data[0].size(); i++) {
+            coord_t x;
+            for (unsigned int j=0; j<_data.size(); j++) {
+                x.push_back(_data[j][i]);
+            }
+            new_data.push_back(x);
+        }
+        
+        _data = new_data;
+        std::cout << _data.size() << "\t" << _data[0].size() << "\n";
     }
 }

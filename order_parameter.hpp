@@ -13,6 +13,9 @@
 #include "struct_def.h"
 #include "trajectory.hpp"
 
+//set all calculation flags then output all results
+//have default flags
+
 namespace trajectoryAnalysis {
     
     class OrderParameter{
@@ -21,15 +24,22 @@ namespace trajectoryAnalysis {
         OrderParameter(const char*);
         ~OrderParameter();
         
-        void computeAutoCorrelation();
+        void computeAutoCorrelation(int index=2);
         void computeCrossCorrelation();
+        void computeAverageAndVariance(int j=1);
         
         void computeBondOrderParameter();
+    
+        void printCorrelation();
         
     protected:
         Trajectory* _trajectory;
         coord_list_t _data;
         coord_t _correlation;
+        double _average;
+        double _variance;
+        
+        void restructureData();
         
     };
 }

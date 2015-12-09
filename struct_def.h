@@ -13,6 +13,7 @@
 #include <string>
 #include <complex>
 #include <map>
+#include <cassert>
 
 namespace trajectoryAnalysis {
     
@@ -29,7 +30,7 @@ namespace trajectoryAnalysis {
     typedef std::complex<double> component_t;
     typedef std::vector<component_t> shpdesc_t;
     
-    typedef std::pair<int, double> corr_point_t;
+    typedef std::pair<unsigned long long, double> corr_point_t;
     typedef std::vector< corr_point_t > corr_point_list_t;
     
     typedef std::vector< std::complex<double> > component_list_t;
