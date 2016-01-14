@@ -18,6 +18,10 @@
 
 namespace trajectoryAnalysis {
     
+    /**
+     \brief A class to perform specific calculations on/for order parameters
+     */
+    
     class OrderParameter{
     public:
         OrderParameter(Trajectory&);
@@ -28,7 +32,7 @@ namespace trajectoryAnalysis {
         void computeCrossCorrelation();
         void computeAverageAndVariance(int j=1);
         
-        void computeBondOrderParameter();
+        //virtual void compute();
     
         void printCorrelation();
         
@@ -39,7 +43,7 @@ namespace trajectoryAnalysis {
         double _average;
         double _variance;
         
-        void restructureData();
+        void _restructureData();
         
     };
 }

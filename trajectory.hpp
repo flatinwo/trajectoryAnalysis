@@ -12,11 +12,14 @@
 #include <stdio.h>
 #include "struct_def.h"
 
-//to do write static_cast or something similar for trajectoryAnalysis::xyztrajectory_t to trajectoryAnalysis::trajectory_t
+//to do write static_cast, dynamic_cast or something similar for trajectoryAnalysis::xyztrajectory_t to trajectoryAnalysis::trajectory_t
 
 namespace trajectoryAnalysis {
     
     class Trajectory{
+        
+        friend class BondOrderParameter;
+        
     public:
         Trajectory();
         Trajectory(const char* filename);
@@ -28,7 +31,10 @@ namespace trajectoryAnalysis {
         double getTimeStep();
         trajectory_t getTrajectory();
         void unfold();
+        
         void computeMeanSquaredDisplacement();
+        void computeFskt();
+        void computeGofR();
         
         friend std::ostream& operator << (std::ostream&, const Trajectory&);
         

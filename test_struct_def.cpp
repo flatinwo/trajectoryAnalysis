@@ -7,7 +7,8 @@
 //
 
 #include "struct_def.h"
-#include "io.hpp";
+#include "io.hpp"
+#include <iostream>
 
 using namespace trajectoryAnalysis;
 

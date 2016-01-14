@@ -16,6 +16,7 @@
 #include "spatial.hpp"
 #include "visualizer.hpp"
 #include "visualizer_xyz.hpp"
+#include "bond_order_parameter.hpp"
 
 
 #endif /* trajectoryAnalysis_h */

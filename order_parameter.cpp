@@ -31,7 +31,7 @@ namespace trajectoryAnalysis {
     OrderParameter::OrderParameter(const char* filename){
         load(filename, _data);
         std::cout << "Size of data is\t" << _data.size() << "\t" << _data[0].size() << std::endl;
-        restructureData();
+        _restructureData();
     }
     
     OrderParameter::OrderParameter(Trajectory& traj):_trajectory(&traj){
@@ -101,7 +101,7 @@ namespace trajectoryAnalysis {
     
     
     
-    void OrderParameter::restructureData(){
+    void OrderParameter::_restructureData(){
         coord_list_t new_data;
         
         for (unsigned int i=0; i<_data[0].size(); i++) {

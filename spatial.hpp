@@ -15,6 +15,16 @@
 
 namespace trajectoryAnalysis {
     
+    struct orient_info{
+        orient_info():
+        cutoffsq(4.0),
+        iswithincutoffsq(true){
+        }
+        
+        double cutoffsq;
+        bool iswithincutoffsq;
+    };
+    
     //the squared distance between two particles
     double distancesq(coord_t& x1, coord_t& x2);
     
@@ -26,6 +36,16 @@ namespace trajectoryAnalysis {
     
     //the squared distance and vector distance between two particles in a box
     double_coord_t distancesqandvec(coord_t& x1, coord_t& x2, Box&);
+    
+    //the r, angular theta and phi between two particles
+    coord_t spherical_orientation(coord_t& x1, coord_t& x2, Box&);
+    
+    //angular theta and phi between two particles
+    coord_t orientation(coord_t& x1, coord_t& x2, Box&);
+    
+    //the angular theta and phi between two particles within a given distance and determine if within distance
+    coord_t orientation(coord_t& x1, coord_t& x2, Box&, orient_info&);
+    
     
     //the distance between two particles
     double distance(coord_t& x1, coord_t&x2);

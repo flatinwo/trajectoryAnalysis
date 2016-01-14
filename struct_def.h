@@ -20,12 +20,14 @@ namespace trajectoryAnalysis {
     typedef std::vector<double> coord_t;
     typedef std::vector<bool> bool_list_t;
     typedef std::vector<coord_t> coord_list_t;
+    typedef std::vector<unsigned int>  unsigned_list_t;
     
     typedef std::map<double,double> function1d_t;
     
     typedef std::map<int,coord_list_t> vector1d_t;
     
     typedef std::pair<double,coord_t> double_coord_t;
+    typedef std::pair<double, double>  double_pair_t;
     
     typedef std::complex<double> component_t;
     typedef std::vector<component_t> shpdesc_t;
