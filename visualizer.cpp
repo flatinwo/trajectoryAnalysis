@@ -25,5 +25,9 @@ namespace trajectoryAnalysis {
     void Visualizer::visualize(Snap& snap){
         assert(0);
     }
+    
+    void Visualizer::visualize(xyztrajectory_t& traj){
+        assert(0);
+    }
 }
 

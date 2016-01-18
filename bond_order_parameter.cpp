@@ -12,14 +12,21 @@
 #include <iostream>
 #include <cassert>
 #include <gsl/gsl_sf_coupling.h>
+#include <algorithm>
 
 //when porting, will need to utilize boost and gsl
 //now to compute local order and also include neighbor lists
 //load trajectory with standard txt for trajectory
+//useful references (1) http://www.pas.rochester.edu/~wangyt/algorithms/bop/
+//                  (2) Y. Wang, S. Teitel and C. Dellago, Journal of Chemical Physics 122, 214722 (2005)
+//
 
 using namespace boost::math;
 
 namespace trajectoryAnalysis {
+    
+#define MAX_NUMBER_OF_NEIGHBORS 120
+    
     BondOrderParameter::BondOrderParameter(Trajectory& traj, int l):
     OrderParameter(traj),
     _l(l),
@@ -27,8 +34,12 @@ namespace trajectoryAnalysis {
         assert(_l>1);
         _rcutoff = 0.74;
         _requireThirdOrderInvaraints = true;
+        _useMaxNumberOfNeighbors = false;
+        _max_number_of_neighbors = 0;
         _snap = &_trajectory->_trajectory[0];
-        _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0);
+        _nearest_neighbors.resize(_snap->_center_of_mass_list.size(),
+                                  double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
+        _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0.);
         
         _Wl = 0.;
         _Wl_i.resize(_snap->_center_of_mass_list.size(), std::complex<double>(0.,0.));
@@ -47,6 +58,18 @@ namespace trajectoryAnalysis {
         _l = l;
     }
     
+    void BondOrderParameter::setRcutOff(double rcutoff){
+        assert(rcutoff > 0.);
+        _rcutoff = rcutoff;
+    }
+    
+    void BondOrderParameter::setMaxNumberOfNearestNeighbors(unsigned int n_nghbrs){
+        assert(n_nghbrs > 0);
+        _max_number_of_neighbors = n_nghbrs;
+        _useMaxNumberOfNeighbors = true;
+        
+    }
+    
     double BondOrderParameter::getQl(){
         return _Ql;
     }
@@ -58,7 +81,57 @@ namespace trajectoryAnalysis {
             
     }
     
+    void BondOrderParameter::_computeNearestNeighbors(){
+        coord_list_t* com = &(_snap->_center_of_mass_list);
+        double rcutsqd = _rcutoff*_rcutoff;
+        
+        for (unsigned int i=0; i<com->size(); i++) {
+            unsigned int k=0;
+            for (unsigned int j=0; j<com->size(); j++) {
+                if (i==j) continue;
+                double rsq = distancesq((*com)[i], (*com)[j], _snap->box);
+                if (rsq < rcutsqd) {
+                    _nearest_neighbors[i][k].first = rsq;
+                    _nearest_neighbors[i][k].second = j;
+                    k++;
+                    assert(k < MAX_NUMBER_OF_NEIGHBORS);
+                }
+            }
+            std::sort(_nearest_neighbors[i].begin(), _nearest_neighbors[i].begin()+k); //implement sort up to
+            assert(_nearest_neighbors[i].size() >= _max_number_of_neighbors);
+        }
+    }
+    
     void BondOrderParameter::compute(){
+        if (!_useMaxNumberOfNeighbors) _computeWithRcutOff();
+        else _computeWithMaxNeighbors();
+    }
+    
+    void BondOrderParameter::_computeWithMaxNeighbors(){
+        _computeNearestNeighbors(); //get information about nearest neighbors
+        coord_list_t* com = &(_snap->_center_of_mass_list);
+        
+        
+        for (unsigned int i=0; i<com->size(); i++) {
+            for (unsigned int j=0; j < _max_number_of_neighbors; j++) {
+                unsigned int k = _nearest_neighbors[i][j].second;
+                _computeHarmonics(i, k);
+            }
+            for (unsigned int m=0; m <_qlm_i[i].size(); m++) {
+                assert(_number_of_neighbors[i] > 0);
+                _qlm_i[i][m] /= (double) _number_of_neighbors[i];
+                _Qlm[m] += _qlm_i[i][m];
+            }
+            if (_requireThirdOrderInvaraints) _computeWl_i(i);
+        }
+        _computeQl();
+        if (_requireThirdOrderInvaraints) _computeWl();
+        
+        for (auto& i : _number_of_neighbors)
+            std::cout << i << std::endl;
+    }
+    
+    void BondOrderParameter::_computeWithRcutOff(){
         coord_list_t* com = &(_snap->_center_of_mass_list);
         for (unsigned int i=0; i<com->size(); i++) {
             for (unsigned int j=0; j<com->size(); j++) {
@@ -78,9 +151,8 @@ namespace trajectoryAnalysis {
         _computeQl();
         if (_requireThirdOrderInvaraints) _computeWl();
         
-        //for (auto& i : _number_of_neighbors)
-          //  std::cout << i << std::endl;
-        
+        for (auto& i : _number_of_neighbors)
+            std::cout << i << std::endl;
     }
     
     //compute Harmonics for system

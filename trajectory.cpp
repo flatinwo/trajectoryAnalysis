@@ -16,7 +16,7 @@ namespace trajectoryAnalysis {
 #define TRAJMIN 1
     
     //constructor 1
-    Trajectory::Trajectory():_time_step(100), _unfolded(false), maxCorrelationLength(0){
+    Trajectory::Trajectory():maxCorrelationLength(0),_time_step(100), _unfolded(false){
     }
     
     //constructor 2

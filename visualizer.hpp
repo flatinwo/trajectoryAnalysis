@@ -20,6 +20,7 @@ namespace trajectoryAnalysis {
         
         virtual void visualize(trajectory_t&);
         virtual void visualize(Snap&);
+        virtual void visualize(xyztrajectory_t& traj);
         
     protected:
         

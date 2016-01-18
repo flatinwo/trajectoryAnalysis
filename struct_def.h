@@ -28,6 +28,8 @@ namespace trajectoryAnalysis {
     
     typedef std::pair<double,coord_t> double_coord_t;
     typedef std::pair<double, double>  double_pair_t;
+    typedef std::pair<double, unsigned int> double_unsigned_pair_t;
+    typedef std::vector<double_unsigned_pair_t> double_unsigned_pair1d_t;
     
     typedef std::complex<double> component_t;
     typedef std::vector<component_t> shpdesc_t;

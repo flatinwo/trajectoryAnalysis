@@ -26,6 +26,8 @@ namespace trajectoryAnalysis {
         enum Calc_t {GLOBAL, LOCAL, GLOBALANDLOCAL};
         
         void setLvalue(int);
+        void setRcutOff(double);
+        void setMaxNumberOfNearestNeighbors(unsigned int);
         
         double getQl();
         double getWl();
@@ -41,6 +43,9 @@ namespace trajectoryAnalysis {
         unsigned_list_t _number_of_neighbors;       //count of number of neighbors
         component_list_t _Qlm;                      //make this a vector to accommodate several L values
         component_list_t _Wl_i;                     //ditto
+        unsigned int _max_number_of_neighbors;
+        bool _useMaxNumberOfNeighbors;
+        std::vector<double_unsigned_pair1d_t> _nearest_neighbors;
         
         std::vector<component_list_t> _qlm_i;       //make this a vector also to accommodate several LM values
         Snap* _snap;
@@ -49,6 +54,9 @@ namespace trajectoryAnalysis {
         
         double _Ql,_Wl;
         
+        void _computeWithRcutOff();
+        void _computeWithMaxNeighbors();            //also considered as maximum number of bonds
+        
         void _computeHarmonics(unsigned int, unsigned int);
         double _ThreeJSymbol(int, int, int, int, int, int); //well-defined Wigner-3j symbol
         
@@ -56,6 +64,7 @@ namespace trajectoryAnalysis {
         void _computeWl();
         void _computeWl_i(unsigned int);
         void _resize();
+        void _computeNearestNeighbors();
         
     };
 }
