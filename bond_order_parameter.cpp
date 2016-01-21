@@ -127,8 +127,8 @@ namespace trajectoryAnalysis {
         _computeQl();
         if (_requireThirdOrderInvaraints) _computeWl();
         
-        for (auto& i : _number_of_neighbors)
-            std::cout << i << std::endl;
+    //    for (auto& i : _number_of_neighbors)
+    //        std::cout << i << std::endl;
     }
     
     void BondOrderParameter::_computeWithRcutOff(){
@@ -151,8 +151,8 @@ namespace trajectoryAnalysis {
         _computeQl();
         if (_requireThirdOrderInvaraints) _computeWl();
         
-        for (auto& i : _number_of_neighbors)
-            std::cout << i << std::endl;
+     //   for (auto& i : _number_of_neighbors)
+     //       std::cout << i << std::endl;
     }
     
     //compute Harmonics for system
