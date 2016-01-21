@@ -9,7 +9,7 @@
 #include "order_parameter.hpp"
 #include "io.hpp"
 #include <cassert>
-
+#include <algorithm>
 
 #include <boost/accumulators/accumulators.hpp>
 #include <boost/accumulators/statistics/stats.hpp>
@@ -17,6 +17,8 @@
 #include <boost/accumulators/statistics/moment.hpp>
 #include <boost/accumulators/statistics/variance.hpp>
 
+#include <boost/bind.hpp>
+#include <boost/ref.hpp>
 
 //try order-N algorithm in Allen & Tildesey or Frenkel & Smit book for autocorrelation
 //it may be worth it to data in consistent vector format, that is data[0] represents a given set
@@ -83,7 +85,7 @@ namespace trajectoryAnalysis {
         assert(j<_data.size());
         
         
-        for_each(_data[j].begin(), _data[j].end(), std::bind<void>(std::ref(acc), std::placeholders::_1)); //not copying by value
+        std::for_each(_data[j].begin(), _data[j].end(), boost::bind<void>(boost::ref(acc), _1)); //not copying by value
         
         _average = mean(acc);
         _variance = boost::accumulators::variance(acc);
