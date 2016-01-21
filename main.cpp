@@ -13,11 +13,19 @@
 #include "trajectoryAnalysis.h"
 
 
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/moment.hpp>
+
+
 //idea... load trajectory
 //set flag of outputs and then out data
 //out directory provides all info about the trajectory, gofr, MSD, FskT
+//check with rakesh q6 of snap
 
 using namespace trajectoryAnalysis;
+using namespace boost::accumulators;
 
 std::string chirality(coord_list_t& x, const Box& box){
     
@@ -90,8 +98,8 @@ void analyzeChiralityXYZ(xyzfile& snap, const Box& box){
     int natoms = snap.n;
     assert(natoms%4 == 0);
     int nmolecules = natoms/4;
-    unsigned int k ,l;
-    k=l= 0;
+    unsigned int k,l,m;
+    k=l=m=0;
     
     for (int i=0; i<nmolecules; i++) {
         coord_list_t x;
@@ -99,8 +107,10 @@ void analyzeChiralityXYZ(xyzfile& snap, const Box& box){
             x.push_back(snap.x[k++]);
         }
         std::string zeta = chiralityunwrap(x,box);
+        //this is very very inefficent
         for (unsigned int j=0; j<4; j++) {
             snap.type[l++] = zeta;
+            snap.x[m++] = x[j];
         }
     }
     
@@ -111,6 +121,40 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     std::cout << "Hello, World!\n";
     
+    
+    Trajectory traj("/Users/Folarin/Documents/vmd_views/water/initial_config2.xyz");
+    //Trajectory traj("/Users/Folarin/Library/Developer/Xcode/DerivedData/Build/Products/Debug/me2.xyz");
+    BondOrderParameter bop(traj,6);
+    bop.setRcutOff(2.0);
+    bop.setMaxNumberOfNearestNeighbors(12);
+    bop.compute();
+    std::cout << bop.getQl() << "\t" << bop.getWl() << std::endl;
+    
+    //test boost
+    /*accumulator_set<double, stats<tag::mean, tag::moment<2> > > acc;
+    
+    //push in some data
+    acc(1.2);
+    acc(2.3);
+    acc(3.4);
+    acc(4.5);
+    
+    //Display the results
+    std::cout << "Mean:\t" << mean(acc) << std::endl;
+    std::cout << "Moment:\t" << boost::accumulators::moment<2> (acc) << std::endl;
+    
+    
+    //Now test average and variance
+    OrderParameter o1("/Users/Folarin/Library/Developer/Xcode/DerivedData/Build/Products/Debug/logme.txt");
+    o1.computeAverageAndVariance(1);
+    
+    
+    std::cout <<"\n\nCorrelations\n\n";
+    o1.computeAutoCorrelation(1);
+    o1.printCorrelation();
+    */
+
+    /*
     xyzfile data;
     Box box;
     box.box_hi[0] = atof(argv[3]);
@@ -148,7 +192,7 @@ int main(int argc, const char * argv[]) {
 //    savexyz(filename1, traj);
     std::cout << typecountmax[0] << "\t" << typecountmax[1] << "\t" << typecountmax[2] << "\n"; 
  
-   
+*/   
     
     
     
