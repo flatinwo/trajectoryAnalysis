@@ -22,7 +22,7 @@ namespace trajectoryAnalysis {
         
     public:
         Trajectory();
-        Trajectory(const char* filename);
+        Trajectory(const char* filename, bool=false, unsigned int i=1, unsigned int=5);
         ~Trajectory();
         
         unsigned int maxCorrelationLength;

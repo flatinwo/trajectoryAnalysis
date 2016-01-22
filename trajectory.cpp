@@ -20,12 +20,13 @@ namespace trajectoryAnalysis {
     }
     
     //constructor 2
-    Trajectory::Trajectory(const char* filename){
+    Trajectory::Trajectory(const char* filename, bool fancy, unsigned int index, unsigned int every){
 
 	_time_step = 100; _unfolded = false; maxCorrelationLength=0;
 
         //load trajectory
-        loadxyz(filename, _trajectory);
+        if (fancy) loadxyzfancy(filename, _trajectory, index, every);
+        else loadxyz(filename, _trajectory);
         
         //compute time step and maximum correlation length
         computeTimeStep();

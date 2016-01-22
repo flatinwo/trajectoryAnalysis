@@ -35,6 +35,7 @@ namespace trajectoryAnalysis{
     };
     
     void loadxyz(const char* filename, trajectory_t& system, arg_t arg=0x0);
+    void loadxyzfancy(const char* filename, trajectory_t& system, unsigned int=1, unsigned int=1);
     
     struct xyzfile{
         unsigned int n;

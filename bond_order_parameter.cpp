@@ -13,6 +13,8 @@
 #include <cassert>
 #include <gsl/gsl_sf_coupling.h>
 #include <algorithm>
+#include <sstream>
+#include <iostream>
 
 //when porting, will need to utilize boost and gsl
 //now to compute local order and also include neighbor lists
@@ -37,6 +39,7 @@ namespace trajectoryAnalysis {
         _useMaxNumberOfNeighbors = false;
         _max_number_of_neighbors = 0;
         _snap = &_trajectory->_trajectory[0];
+        _nmolecules = (unsigned int)_snap->_center_of_mass_list.size();
         _nearest_neighbors.resize(_snap->_center_of_mass_list.size(),
                                   double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
         _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0.);
@@ -70,13 +73,17 @@ namespace trajectoryAnalysis {
         
     }
     
+    void BondOrderParameter::setThirdOrderInvariants(bool flag){
+        _requireThirdOrderInvaraints = flag;
+    }
+    
     double BondOrderParameter::getQl(){
         return _Ql;
     }
     
     double BondOrderParameter::getWl(){
         if (!_requireThirdOrderInvaraints) std::cerr << "ERROR: BondOrderParameter::getWl()\n" <<
-                                                        "Cannot Wl without requiring it\n";
+                                                        "Cannot get Wl without requiring it\n";
         return _Wl;
             
     }
@@ -108,51 +115,54 @@ namespace trajectoryAnalysis {
     }
     
     void BondOrderParameter::_computeWithMaxNeighbors(){
-        _computeNearestNeighbors(); //get information about nearest neighbors
-        coord_list_t* com = &(_snap->_center_of_mass_list);
+        trajectory_t* traj = &(_trajectory->_trajectory);
         
-        
-        for (unsigned int i=0; i<com->size(); i++) {
-            for (unsigned int j=0; j < _max_number_of_neighbors; j++) {
-                unsigned int k = _nearest_neighbors[i][j].second;
-                _computeHarmonics(i, k);
+        for (unsigned int f=0; f<traj->size(); f++) {
+            _snap = &(*traj)[f];
+            _computeNearestNeighbors(); //get information about nearest neighbors
+            coord_list_t* com = &(_snap->_center_of_mass_list);
+            
+            
+            for (unsigned int i=0; i<com->size(); i++) {
+                for (unsigned int j=0; j < _max_number_of_neighbors; j++) {
+                    unsigned int k = _nearest_neighbors[i][j].second;
+                    _computeHarmonics(i, k);
+                }
+                for (unsigned int m=0; m <_qlm_i[i].size(); m++) {
+                    assert(_number_of_neighbors[i] > 0);
+                    assert(_number_of_neighbors[i] == _max_number_of_neighbors);
+                    _qlm_i[i][m] /= (double) _number_of_neighbors[i];
+                    _Qlm[m] += _qlm_i[i][m];
+                }
+                if (_requireThirdOrderInvaraints) _computeWl_i(i);
             }
-            for (unsigned int m=0; m <_qlm_i[i].size(); m++) {
-                assert(_number_of_neighbors[i] > 0);
-                _qlm_i[i][m] /= (double) _number_of_neighbors[i];
-                _Qlm[m] += _qlm_i[i][m];
-            }
-            if (_requireThirdOrderInvaraints) _computeWl_i(i);
+            _computeQl();
+            if (_requireThirdOrderInvaraints) _computeWl();
         }
-        _computeQl();
-        if (_requireThirdOrderInvaraints) _computeWl();
-        
-    //    for (auto& i : _number_of_neighbors)
-    //        std::cout << i << std::endl;
     }
     
     void BondOrderParameter::_computeWithRcutOff(){
-        coord_list_t* com = &(_snap->_center_of_mass_list);
-        for (unsigned int i=0; i<com->size(); i++) {
-            for (unsigned int j=0; j<com->size(); j++) {
-                if (i==j) continue;
-                _computeHarmonics(i, j);
-                
-            }
-            //for (auto& z : _qlm_i[i]) z /= (double)_number_of_neighbors[i];  //for latter write operators
-            //_Qlm += _qlm_i[i];
-            for (unsigned int m=0; m <_qlm_i[i].size(); m++) {
-                assert(_number_of_neighbors[i] > 0);
-                _qlm_i[i][m] /= (double) _number_of_neighbors[i];
-                _Qlm[m] += _qlm_i[i][m];
-            }
-            if (_requireThirdOrderInvaraints) _computeWl_i(i);
-        }
-        _computeQl();
-        if (_requireThirdOrderInvaraints) _computeWl();
+        trajectory_t* traj = &(_trajectory->_trajectory);
         
-     //   for (auto& i : _number_of_neighbors)
-     //       std::cout << i << std::endl;
+        for (unsigned int f=0; f<traj->size(); f++) {
+            _snap = &(*traj)[f];
+            coord_list_t* com = &(_snap->_center_of_mass_list);
+            for (unsigned int i=0; i<com->size(); i++) {
+                for (unsigned int j=0; j<com->size(); j++) {
+                    if (i==j) continue;
+                    _computeHarmonics(i, j);
+                    
+                }
+                for (unsigned int m=0; m <_qlm_i[i].size(); m++) {
+                    assert(_number_of_neighbors[i] > 0);
+                    _qlm_i[i][m] /= (double) _number_of_neighbors[i];
+                    _Qlm[m] += _qlm_i[i][m];
+                }
+                if (_requireThirdOrderInvaraints) _computeWl_i(i);
+            }
+            _computeQl();
+            if (_requireThirdOrderInvaraints) _computeWl();
+        }
     }
     
     //compute Harmonics for system
@@ -184,6 +194,9 @@ namespace trajectoryAnalysis {
         for (unsigned int i=0; i<_Qlm.size();i++) sum += std::norm(_Qlm[i]);
         sum *= (4.*M_PI/(double) (2*_l + 1));
         _Ql = sqrt(sum)/(double) _snap->_center_of_mass_list.size();
+        _Qls.push_back(_Ql);
+        
+        if (!_requireThirdOrderInvaraints) _refresh();
     }
     
     //compute Wl of system
@@ -205,7 +218,64 @@ namespace trajectoryAnalysis {
     }
     
     void BondOrderParameter::_computeWl(){
+        _Wl = 0.;
         for (auto& i : _Wl_i) _Wl += i.real();
         _Wl /= (double) _Wl_i.size();
+        _Wls.push_back(_Wl);
+        _refresh();
+    }
+    
+    void BondOrderParameter::print(){
+        assert(_Qls.size()>0);
+        if (_requireThirdOrderInvaraints){
+            assert(_Wls.size() == _Qls.size());
+        }
+        double timestep = _trajectory->_time_step;
+        
+        _openFiles();
+        for (unsigned int i=0; i<_Qls.size(); i++) {
+            double time = ((double) i)*timestep;
+            *_ofiles[0] << time << "\t" << _Qls[i] << std::endl;
+            if (_requireThirdOrderInvaraints) *_ofiles[1] << time << "\t" << _Wls[i] << std::endl;
+        }
+        _closeFiles();
+    }
+    
+    void BondOrderParameter::_refresh(){
+        //refresh _qlmi
+        for (auto& m : _qlm_i)
+            for (auto& l : m) l = std::complex<double>(0.,0.);
+        
+        //refresh _Qlm
+        for (auto& i: _Qlm) i = std::complex<double>(0.,0.);
+        
+        //number of nearest neighbors
+        for (auto& n :_number_of_neighbors) n = 0;
+        
+        //refresh Wl_i
+        if (_requireThirdOrderInvaraints)
+            for (auto& i : _Wl_i) i = std::complex<double>(0.,0.);
+        
+    }
+    
+    void BondOrderParameter::_openFiles(){
+        if (_requireThirdOrderInvaraints) _ofiles.resize(2);
+        else _ofiles.resize(1);
+        
+        std::ostringstream os;
+        os << std::setprecision(4);
+        os << "Q_" << _l << ".txt";
+        _ofiles[0].reset(new std::ofstream(os.str().c_str()));
+        
+        if (_requireThirdOrderInvaraints) {
+            os.str("");
+            os.clear();
+            os << "W_" << _l << ".txt";
+            _ofiles[1].reset(new std::ofstream(os.str().c_str()));
+        }
+    }
+    
+    void BondOrderParameter::_closeFiles(){
+        for (auto& i : _ofiles) i->close();
     }
 }

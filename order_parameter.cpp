@@ -83,16 +83,11 @@ namespace trajectoryAnalysis {
     void OrderParameter::computeAverageAndVariance(int j){
         accumulator_set<double, stats< tag::mean, tag::variance > > acc; //typede this
         assert(j<_data.size());
-        
-        
         std::for_each(_data[j].begin(), _data[j].end(), boost::bind<void>(boost::ref(acc), _1)); //not copying by value
-        
         _average = mean(acc);
         _variance = boost::accumulators::variance(acc);
-        
         std::cout << "Average is\t" << _average << std::endl;
         std::cout << "Variance is\t" << _variance << std::endl;
-
     }
     
     

@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 #include "order_parameter.hpp"
+#include <fstream>
+#include <memory>
 
 namespace trajectoryAnalysis {
     
@@ -28,9 +30,11 @@ namespace trajectoryAnalysis {
         void setLvalue(int);
         void setRcutOff(double);
         void setMaxNumberOfNearestNeighbors(unsigned int);
+        void setThirdOrderInvariants(bool=true);
         
         double getQl();
         double getWl();
+        void print();
         
         void addLvalue(int);
         
@@ -44,6 +48,7 @@ namespace trajectoryAnalysis {
         component_list_t _Qlm;                      //make this a vector to accommodate several L values
         component_list_t _Wl_i;                     //ditto
         unsigned int _max_number_of_neighbors;
+        unsigned int _nmolecules;
         bool _useMaxNumberOfNeighbors;
         std::vector<double_unsigned_pair1d_t> _nearest_neighbors;
         
@@ -53,6 +58,8 @@ namespace trajectoryAnalysis {
         coord_t _coord;
         
         double _Ql,_Wl;
+        std::vector<double> _Qls;                   //Qls..
+        std::vector<double> _Wls;                   //Wls..
         
         void _computeWithRcutOff();
         void _computeWithMaxNeighbors();            //also considered as maximum number of bonds
@@ -65,6 +72,13 @@ namespace trajectoryAnalysis {
         void _computeWl_i(unsigned int);
         void _resize();
         void _computeNearestNeighbors();
+        void _refresh();
+        void _refresh(unsigned int);
+        
+        //file operations
+        std::vector< std::unique_ptr<std::ofstream> > _ofiles;
+        void _openFiles();
+        void _closeFiles();
         
     };
 }
