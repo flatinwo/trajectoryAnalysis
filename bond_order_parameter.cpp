@@ -27,7 +27,7 @@ using namespace boost::math;
 
 namespace trajectoryAnalysis {
     
-#define MAX_NUMBER_OF_NEIGHBORS 24
+#define MAX_NUMBER_OF_NEIGHBORS 36
     
     BondOrderParameter::BondOrderParameter(Trajectory& traj, int l):
     OrderParameter(traj),
@@ -105,7 +105,8 @@ namespace trajectoryAnalysis {
                 }
             }
             std::sort(_nearest_neighbors[i].begin(), _nearest_neighbors[i].begin()+k); //implement sort up to
-            assert(_nearest_neighbors[i].size() >= _max_number_of_neighbors);
+            assert(k >= _max_number_of_neighbors);
+            assert(k > 0);  //Number of nearest numbers too many
         }
     }
     

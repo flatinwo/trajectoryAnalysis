@@ -122,13 +122,17 @@ int main(int argc, const char * argv[]) {
     std::cout << "Hello, World!\n";
     
     
-    Trajectory traj("/Users/Folarin/Documents/vmd_views/water/initial_config2.xyz");
-    //Trajectory traj("/Users/Folarin/Library/Developer/Xcode/DerivedData/Build/Products/Debug/me2.xyz");
+    const char* filename = "/Users/Folarin/Documents/vmd_views/water/initial_configt.xyz";
+    
+    Trajectory traj(filename,true,1,5);
+    
     BondOrderParameter bop(traj,6);
-    bop.setRcutOff(2.0);
-    bop.setMaxNumberOfNearestNeighbors(12);
+    bop.setRcutOff(3.2);
+    bop.setMaxNumberOfNearestNeighbors(4);
+    bop.setThirdOrderInvariants(true);
     bop.compute();
     std::cout << bop.getQl() << "\t" << bop.getWl() << std::endl;
+    bop.print();
     
     //test boost
     /*accumulator_set<double, stats<tag::mean, tag::moment<2> > > acc;
