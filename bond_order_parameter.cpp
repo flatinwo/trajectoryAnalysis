@@ -27,7 +27,7 @@ using namespace boost::math;
 
 namespace trajectoryAnalysis {
     
-#define MAX_NUMBER_OF_NEIGHBORS 120
+#define MAX_NUMBER_OF_NEIGHBORS 24
     
     BondOrderParameter::BondOrderParameter(Trajectory& traj, int l):
     OrderParameter(traj),
@@ -273,6 +273,8 @@ namespace trajectoryAnalysis {
             os << "W_" << _l << ".txt";
             _ofiles[1].reset(new std::ofstream(os.str().c_str()));
         }
+        
+        std::fill(_nearest_neighbors.begin(), _nearest_neighbors.end(), double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
     }
     
     void BondOrderParameter::_closeFiles(){
