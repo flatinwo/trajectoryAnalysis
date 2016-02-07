@@ -33,21 +33,15 @@ namespace trajectoryAnalysis {
     
 #define MAX_NUMBER_OF_NEIGHBORS 36
     
-    OrderParameter::OrderParameter(const char* filename){
-        load(filename, _data);
-        std::cout << "Size of data is\t" << _data.size() << "\t" << _data[0].size() << std::endl;
-        _restructureData();
-    }
+    /*OrderParameter::OrderParameter(const char* filename){
+        //load(filename, _data);
+        std::cout << "I am not going to do anything\n";
+        //std::cout << "Size of data is\t" << _data.size() << "\t" << _data[0].size() << std::endl;
+        //_restructureData();
+    }*/
     
     OrderParameter::OrderParameter(Trajectory& traj):_trajectory(&traj),_mode(GLOBAL){
-        _rcutoff = 0.74;
-        _useMaxNumberOfNeighbors = false;
-        _max_number_of_neighbors = 0;
-        _snap = &_trajectory->_trajectory[0];
-        _nmolecules = (unsigned int)_snap->_center_of_mass_list.size();
-        _nearest_neighbors.resize(_snap->_center_of_mass_list.size(),
-                                  double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
-        _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0.);
+        _initialize();
     }
     
     OrderParameter::~OrderParameter(){
@@ -101,9 +95,18 @@ namespace trajectoryAnalysis {
         assert(virtual_function_overriden);
     }
     
+    void OrderParameter::_initialize(){
+        _rcutoff = 0.74;
+        _useMaxNumberOfNeighbors = false;
+        _max_number_of_neighbors = 0;
+        _snap = &_trajectory->_trajectory[0];
+        _nmolecules = (unsigned int)_snap->_center_of_mass_list.size();
+        _nearest_neighbors.resize(_snap->_center_of_mass_list.size(),
+                                  double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
+        _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0.);
+    }
     
-    
-    
+    /*
     void OrderParameter::_restructureData(){
         coord_list_t new_data;
         
@@ -118,4 +121,5 @@ namespace trajectoryAnalysis {
         _data = new_data;
         std::cout << _data.size() << "\t" << _data[0].size() << "\n";
     }
+    */
 }

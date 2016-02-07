@@ -41,14 +41,9 @@ namespace trajectoryAnalysis {
         void printCorrelation();
         
     protected:
-        double _rcutoff;                            //maximum distance for neighbors
-        
         Trajectory* _trajectory;
-        
+        double _rcutoff;                            //maximum distance for neighbors
         coord_list_t _data;
-        coord_t _correlation;
-        double _average;
-        double _variance;
         
         unsigned_list_t _number_of_neighbors;       //count of number of neighbors
         unsigned int _max_number_of_neighbors;
@@ -60,6 +55,7 @@ namespace trajectoryAnalysis {
         Calc_t _mode;
         coord_t _coord;
         
+        void _initialize();
         void _computeNearestNeighbors();
         void _refreshNeighbors();
         void _refresh(unsigned int);
