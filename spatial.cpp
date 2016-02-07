@@ -70,6 +70,17 @@ namespace trajectoryAnalysis {
     }
     
     
+    //return the cosine angle between three vectors in a box
+    double cosine_angle(coord_t& xref, coord_t& x1, coord_t& x2, Box& box){
+        double_coord_t x1ref = distancesqandvec(x1, xref, box);
+        double_coord_t x2ref = distancesqandvec(x2, xref, box);
+        
+        double cos = 0.;
+        for (unsigned int i=0; i < x1.size(); i++) cos += x1ref.second[i]*x2ref.second[i];
+        cos /= sqrt(x1ref.first*x2ref.first);
+        return cos;
+    }
+    
     double distancesq(coord_t& x1, coord_t& x2, coord_t& box_period, bool_list_t& periodic){
         
         unsigned long dim = x1.size();

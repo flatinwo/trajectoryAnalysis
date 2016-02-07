@@ -31,23 +31,12 @@ namespace trajectoryAnalysis {
     
     BondOrderParameter::BondOrderParameter(Trajectory& traj, int l):
     OrderParameter(traj),
-    _l(l),
-    _mode(GLOBAL){
+    _l(l){
         assert(_l>1);
-        _rcutoff = 0.74;
         _requireThirdOrderInvaraints = true;
-        _useMaxNumberOfNeighbors = false;
-        _max_number_of_neighbors = 0;
-        _snap = &_trajectory->_trajectory[0];
-        _nmolecules = (unsigned int)_snap->_center_of_mass_list.size();
-        _nearest_neighbors.resize(_snap->_center_of_mass_list.size(),
-                                  double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
-        _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0.);
-        
         _Wl = 0.;
         _Wl_i.resize(_snap->_center_of_mass_list.size(), std::complex<double>(0.,0.));
         _qlm_i.resize(_snap->_center_of_mass_list.size());
-        
         for (auto& m : _qlm_i) m.resize(2*_l+1, std::complex<double>(0,0));
         _Qlm.resize(2*_l+1,std::complex<double>(0,0));
     }
@@ -61,17 +50,6 @@ namespace trajectoryAnalysis {
         _l = l;
     }
     
-    void BondOrderParameter::setRcutOff(double rcutoff){
-        assert(rcutoff > 0.);
-        _rcutoff = rcutoff;
-    }
-    
-    void BondOrderParameter::setMaxNumberOfNearestNeighbors(unsigned int n_nghbrs){
-        assert(n_nghbrs > 0);
-        _max_number_of_neighbors = n_nghbrs;
-        _useMaxNumberOfNeighbors = true;
-        
-    }
     
     void BondOrderParameter::setThirdOrderInvariants(bool flag){
         _requireThirdOrderInvaraints = flag;
@@ -87,28 +65,7 @@ namespace trajectoryAnalysis {
         return _Wl;
             
     }
-    
-    void BondOrderParameter::_computeNearestNeighbors(){
-        coord_list_t* com = &(_snap->_center_of_mass_list);
-        double rcutsqd = _rcutoff*_rcutoff;
-        
-        for (unsigned int i=0; i<com->size(); i++) {
-            unsigned int k=0;
-            for (unsigned int j=0; j<com->size(); j++) {
-                if (i==j) continue;
-                double rsq = distancesq((*com)[i], (*com)[j], _snap->box);
-                if (rsq < rcutsqd) {
-                    _nearest_neighbors[i][k].first = rsq;
-                    _nearest_neighbors[i][k].second = j;
-                    k++;
-                    assert(k < MAX_NUMBER_OF_NEIGHBORS);
-                }
-            }
-            std::sort(_nearest_neighbors[i].begin(), _nearest_neighbors[i].begin()+k); //implement sort up to
-            assert(k >= _max_number_of_neighbors);
-            assert(k > 0);  //Number of nearest numbers too many
-        }
-    }
+
     
     void BondOrderParameter::compute(){
         if (!_useMaxNumberOfNeighbors) _computeWithRcutOff();
@@ -250,8 +207,7 @@ namespace trajectoryAnalysis {
         //refresh _Qlm
         for (auto& i: _Qlm) i = std::complex<double>(0.,0.);
         
-        //number of nearest neighbors
-        for (auto& n :_number_of_neighbors) n = 0;
+        _refreshNeighbors();
         
         //refresh Wl_i
         if (_requireThirdOrderInvaraints)
@@ -274,8 +230,7 @@ namespace trajectoryAnalysis {
             os << "W_" << _l << ".txt";
             _ofiles[1].reset(new std::ofstream(os.str().c_str()));
         }
-        
-        std::fill(_nearest_neighbors.begin(), _nearest_neighbors.end(), double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
+
     }
     
     void BondOrderParameter::_closeFiles(){

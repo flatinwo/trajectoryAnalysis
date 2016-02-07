@@ -40,12 +40,8 @@ namespace trajectoryAnalysis {
     //the r, angular theta and phi between two particles
     coord_t spherical_orientation(coord_t& x1, coord_t& x2, Box&);
     
-    //angular theta and phi between two particles
-    coord_t orientation(coord_t& x1, coord_t& x2, Box&);
-    
-    //the angular theta and phi between two particles within a given distance and determine if within distance
-    coord_t orientation(coord_t& x1, coord_t& x2, Box&, orient_info&);
-    
+    //return the cosine angle between three vectors in a box
+    double cosine_angle(coord_t& xref, coord_t& x1, coord_t& x2, Box& box);
     
     //the distance between two particles
     double distance(coord_t& x1, coord_t&x2);

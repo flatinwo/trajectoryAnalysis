@@ -8,6 +8,7 @@
 
 #include "order_parameter.hpp"
 #include "io.hpp"
+#include "spatial.hpp"
 #include <cassert>
 #include <algorithm>
 
@@ -30,71 +31,76 @@ using namespace boost::accumulators;
 
 namespace trajectoryAnalysis {
     
+#define MAX_NUMBER_OF_NEIGHBORS 36
+    
     OrderParameter::OrderParameter(const char* filename){
         load(filename, _data);
         std::cout << "Size of data is\t" << _data.size() << "\t" << _data[0].size() << std::endl;
         _restructureData();
     }
     
-    OrderParameter::OrderParameter(Trajectory& traj):_trajectory(&traj){
-        
+    OrderParameter::OrderParameter(Trajectory& traj):_trajectory(&traj),_mode(GLOBAL){
+        _rcutoff = 0.74;
+        _useMaxNumberOfNeighbors = false;
+        _max_number_of_neighbors = 0;
+        _snap = &_trajectory->_trajectory[0];
+        _nmolecules = (unsigned int)_snap->_center_of_mass_list.size();
+        _nearest_neighbors.resize(_snap->_center_of_mass_list.size(),
+                                  double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
+        _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0.);
     }
     
     OrderParameter::~OrderParameter(){
     }
     
+    
+#pragma mark SETS
+    void OrderParameter::setRcutOff(double rcutoff){
+        assert(rcutoff > 0.);
+        _rcutoff = rcutoff;
+    }
+    
+    void OrderParameter::setMaxNumberOfNearestNeighbors(unsigned int n_nghbrs){
+        assert(n_nghbrs > 0);
+        _max_number_of_neighbors = n_nghbrs;
+        _useMaxNumberOfNeighbors = true;
+        
+    }
+    
 #pragma mark COMPUTES
     
-    //brute force auto-correlation function
-    void OrderParameter::computeAutoCorrelation(int index){
-        assert(_data.size()>index);
-        assert(_data[index].size()>100);
+    void OrderParameter::_computeNearestNeighbors(){
+        coord_list_t* com = &(_snap->_center_of_mass_list);
+        double rcutsqd = _rcutoff*_rcutoff;
         
-        int dataSize = (int) _data[index].size();
-        
-        corr_point_t zeros;
-        zeros.first = zeros.second = 0.;
-        corr_point_list_t correlation((int) floor((double) dataSize/3), zeros);
-        
-        //delete average from all data
-        std::transform(_data[index].begin(), _data[index].end(), _data[index].begin(), std::bind2nd(std::minus<double>(), _average));
-
-        for (unsigned int i=0; i<_data[index].size(); i++) {
-            for (unsigned int j=i; j<_data[index].size(); j++) {
-                if (j-i >= correlation.size())
-                    continue;
-                correlation[j-i].second += _data[index][i]*_data[index][j];
-                correlation[j-i].first++;
+        for (unsigned int i=0; i<com->size(); i++) {
+            unsigned int k=0;
+            for (unsigned int j=0; j<com->size(); j++) {
+                if (i==j) continue;
+                double rsq = distancesq((*com)[i], (*com)[j], _snap->box);
+                if (rsq < rcutsqd) {
+                    _nearest_neighbors[i][k].first = rsq;
+                    _nearest_neighbors[i][k].second = j;
+                    k++;
+                    assert(k < MAX_NUMBER_OF_NEIGHBORS);
+                }
             }
+            std::sort(_nearest_neighbors[i].begin(), _nearest_neighbors[i].begin()+k); //implement sort up to
+            assert(k >= _max_number_of_neighbors);
+            assert(k > 0);  //Number of nearest numbers too many
         }
-        
-        
-        _correlation.clear();        
-        
-        for (auto it=correlation.begin(); it != correlation.end(); ++it) {
-            double corr = (it->second/(double) it->first)/_variance;
-            _correlation.push_back(corr);
-        }
-        
-        
-        assert(_correlation.size() == correlation.size());
     }
     
-    void OrderParameter::computeAverageAndVariance(int j){
-        accumulator_set<double, stats< tag::mean, tag::variance > > acc; //typede this
-        assert(j<_data.size());
-        std::for_each(_data[j].begin(), _data[j].end(), boost::bind<void>(boost::ref(acc), _1)); //not copying by value
-        _average = mean(acc);
-        _variance = boost::accumulators::variance(acc);
-        std::cout << "Average is\t" << _average << std::endl;
-        std::cout << "Variance is\t" << _variance << std::endl;
+    void OrderParameter::_refreshNeighbors(){
+        //number of nearest neighbors
+        for (auto& n :_number_of_neighbors) n = 0;
     }
     
-    
-    void OrderParameter::printCorrelation(){
-        for (unsigned int i=0; i<_correlation.size(); i++)
-            std::cout << i << "\t" << _correlation[i] << std::endl;
+    void OrderParameter::compute(){
+        int virtual_function_overriden=0;
+        assert(virtual_function_overriden);
     }
+    
     
     
     

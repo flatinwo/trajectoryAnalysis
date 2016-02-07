@@ -18,7 +18,9 @@ namespace trajectoryAnalysis {
     
     class Trajectory{
         
+        friend class OrderParameter;
         friend class BondOrderParameter;
+        friend class TetrahedralOrderParameter;
         
     public:
         Trajectory();
