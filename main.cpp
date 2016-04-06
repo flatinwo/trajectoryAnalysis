@@ -31,6 +31,7 @@ using namespace boost::accumulators;
 #define COS30 0.8660254
 #define COS50 0.6427876
 #define MOLSIZE 3
+#define BREAKINGEVENTS 40000
 
 class WaterAnalysis{
     typedef std::vector<unsigned_list_t> unsigned_list2d_t;
@@ -47,6 +48,7 @@ public:
     void setRCutOff(double);
     void setAngleCutOff(double);
     void setSkipFrame(int);
+    void setTimeStep(double);
     
     int  getNumberOfBondBreakingEvents();
     
@@ -62,6 +64,7 @@ protected:
     std::vector<HydrogenBondBreakInfo> _bondBreakInfos;
     
     int _skip_frame;
+    double _time_step;
     
     void _computeHydrogenBonds(int i=0);
     void _computeAllHydrogenBonds();
@@ -81,7 +84,7 @@ protected:
 };
 
 
-WaterAnalysis::WaterAnalysis(Trajectory& traj):_traj(&traj),_skip_frame(50),_rcutoff(3.5),_anglecutoff(COS30){
+WaterAnalysis::WaterAnalysis(Trajectory& traj):_traj(&traj),_skip_frame(50),_time_step(20.),_rcutoff(3.5),_anglecutoff(COS30){
     _trajectory = &_traj->getTrajectory();
 }
 
@@ -98,6 +101,10 @@ void WaterAnalysis::setAngleCutOff(double cutoff){
 void WaterAnalysis::setSkipFrame(int skip){
     assert(skip > 0);
     _skip_frame = skip;
+}
+
+void WaterAnalysis::setTimeStep(double step){
+    _time_step = step;
 }
 
 int WaterAnalysis::getNumberOfBondBreakingEvents(){
@@ -163,7 +170,7 @@ void WaterAnalysis::_computeROO(){
             
             
         }
-        if (total_count > 16000*2*_skip_frame){
+        if (total_count > BREAKINGEVENTS*2*_skip_frame){
             std::cout << "I am going to break this\n";
             break;
         }
@@ -252,7 +259,7 @@ void WaterAnalysis::_normalize(){
 
 void WaterAnalysis::printROO(){
     for (int i=0; i<trajBavg.size(); i++) {
-        std::cout << i - _skip_frame << "\t" << trajAavg[i].second << "\t" << trajBavg[i].second <<
+        std::cout << _time_step*(i - _skip_frame) << "\t" << trajAavg[i].second << "\t" << trajBavg[i].second <<
         "\t" << trajBavg[i].first << std::endl;
     }
 }
@@ -278,7 +285,7 @@ void WaterAnalysis::printNumberHydrogenBonds(){
 
 int main(int argc, const char * argv[]) {
     // insert code here...
-    std::cout << "Hello, World!\n";
+    //std::cout << "Hello, World!\n";
 
     const char* filename = "/Users/Folarin/Documents/vmd_views/water/patchy_colloids/test_snaps/dump22f_2b.xyz";
     
