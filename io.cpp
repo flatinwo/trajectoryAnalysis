@@ -432,12 +432,12 @@ namespace trajectoryAnalysis {
             }
             *os << n << "\n\n";
             if (info.type.size() > 0) {
-                for (int j=0; j<n; j++){
+                for (unsigned int j=0; j<n; j++){
                     *os << info.type[j] << "\t" << xyztraj[i].x[j] << "\n";
                 }
             }
             else{
-                for (int j=0; j<n; j++) *os << "H\t" << xyztraj[i].x[j] << "\n";
+                for (unsigned int j=0; j<n; j++) *os << "H\t" << xyztraj[i].x[j] << "\n";
                 
             }
         }
@@ -468,12 +468,12 @@ namespace trajectoryAnalysis {
         
         *os << n << "\n\n";
         if (info.type.size() > 0) {
-            for (int i=0; i<n; i++){
+            for (unsigned int i=0; i<n; i++){
                 *os << info.type[i] << "\t" << x[i][0] << "\t" << x[i][1] << "\t" << x[i][2] << "\n";
             }
         }
         else{
-            for (int i=0; i<n; i++){
+            for (unsigned int i=0; i<n; i++){
                 *os << "H\t" << x[i][0] << "\t" << x[i][1] << "\t" << x[i][2] << "\n";
             }
         }
