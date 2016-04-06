@@ -239,6 +239,7 @@ namespace trajectoryAnalysis {
                     xyz[0] = xi; xyz[1] = yi; xyz[2] = zi;
                     x.push_back(xyz);
                     system[nsnap]._center_of_mass_list.push_back(x[0]);
+                    system[nsnap]._type_list.push_back(typei);
                     x.clear();
                 }
             }

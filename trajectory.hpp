@@ -31,7 +31,7 @@ namespace trajectoryAnalysis {
         
         int getNumberOfSnaps();
         double getTimeStep();
-        trajectory_t getTrajectory();
+        trajectory_t& getTrajectory();
         void unfold();
         
         void computeMeanSquaredDisplacement();
