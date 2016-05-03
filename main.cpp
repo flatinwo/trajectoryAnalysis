@@ -290,6 +290,7 @@ int main(int argc, const char * argv[]) {
     const char* filename = "/Users/Folarin/Documents/vmd_views/water/patchy_colloids/test_snaps/dump22f_2b.xyz";
     
     Trajectory traj(filename,true,1,1);
+    traj.unfold();
     WaterAnalysis analyze(traj);
     analyze.compute();
     //analyze.printNumberHydrogenBonds();
