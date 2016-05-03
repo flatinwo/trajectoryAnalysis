@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cassert>
 #include <algorithm>
+#include <numeric>
 
 #include "trajectoryAnalysis.h"
 
@@ -27,177 +28,274 @@
 using namespace trajectoryAnalysis;
 using namespace boost::accumulators;
 
-std::string chirality(coord_list_t& x, const Box& box){
-    
-    Box _box = box;
-    assert(x.size() == 4);
-    double_coord_t dr1 = distancesqandvec(x[1], x[0], _box);
-    double_coord_t dr2 = distancesqandvec(x[2], x[1], _box);
-    double_coord_t dr3 = distancesqandvec(x[3], x[2], _box);
-    
-    //compute zeta
-    double c1 = (dr2.second[1]*dr3.second[2] - dr2.second[2]*dr3.second[1]);
-    double c2 = (dr2.second[0]*dr3.second[2] - dr2.second[2]*dr3.second[0]);
-    double c3 = (dr2.second[0]*dr3.second[1] - dr2.second[1]*dr3.second[0]);
-    
-    double zeta = dr1.second[0]*c1 - dr1.second[1]*c2 + dr1.second[2]*c3;
-    zeta /= (sqrt(dr1.first*dr2.first*dr3.first));
-    
-    //std::cout << zeta <<"\n";
-    
-    if (zeta > 0.33) {
-        return "1";
-    }
-    else if (zeta < -0.33){
-        return "2";
-    }
-    else
-        return "3";
+#define COS30 0.8660254
+#define COS50 0.6427876
+#define MOLSIZE 3
+#define BREAKINGEVENTS 40000
 
+class WaterAnalysis{
+    typedef std::vector<unsigned_list_t> unsigned_list2d_t;
+    
+    struct HydrogenBondBreakInfo{
+        std::vector<unsigned int> frames;
+        std::vector<std::pair<short,short>> oxygen_ids;   //first is initial O, second is final O
+        std::vector < std::vector< std::pair<unsigned long,double> > > trajA; //typedef this
+        std::vector < std::vector< std::pair<unsigned long,double> > > trajB;
+    };
+public:
+     WaterAnalysis(Trajectory&);
+    
+    void setRCutOff(double);
+    void setAngleCutOff(double);
+    void setSkipFrame(int);
+    void setTimeStep(double);
+    
+    int  getNumberOfBondBreakingEvents();
+    
+    void printBonded();
+    void printNumberHydrogenBonds();
+    void printROO();
+    
+    
+    void compute();
+    
+protected:
+    std::vector<unsigned_list2d_t> _bondedList;
+    std::vector<HydrogenBondBreakInfo> _bondBreakInfos;
+    
+    int _skip_frame;
+    double _time_step;
+    
+    void _computeHydrogenBonds(int i=0);
+    void _computeAllHydrogenBonds();
+    void _analyzeHydrogenBonds();
+    void _computeROO();
+    void _normalize();
+
+    Trajectory* _traj;
+    trajectory_t* _trajectory;
+    
+    corr_point_list_t trajAavg;
+    corr_point_list_t trajBavg;
+    
+    double _rcutoff;
+    double _anglecutoff;
+    
+};
+
+
+WaterAnalysis::WaterAnalysis(Trajectory& traj):_traj(&traj),_skip_frame(50),_time_step(20.),_rcutoff(3.5),_anglecutoff(COS30){
+    _trajectory = &_traj->getTrajectory();
 }
 
-std::string chiralityunwrap(coord_list_t& x, const Box& box){
-    
-    Box _box = box;
-    assert(x.size() == 4);
-    double_coord_t dr1 = distancesqandvec(x[1], x[0], _box);
-    x[1] = x[0] + dr1.second;
-    
-    
-    double_coord_t dr2 = distancesqandvec(x[2], x[1], _box);
-    x[2] = x[1] + dr2.second;
-    
-    
-    
-    double_coord_t dr3 = distancesqandvec(x[3], x[2], _box);
-    x[3] = x[2] + dr3.second;
-    
-    //compute zeta
-    double c1 = (dr2.second[1]*dr3.second[2] - dr2.second[2]*dr3.second[1]);
-    double c2 = (dr2.second[0]*dr3.second[2] - dr2.second[2]*dr3.second[0]);
-    double c3 = (dr2.second[0]*dr3.second[1] - dr2.second[1]*dr3.second[0]);
-    
-    double zeta = dr1.second[0]*c1 - dr1.second[1]*c2 + dr1.second[2]*c3;
-    zeta /= (sqrt(dr1.first*dr2.first*dr3.first));
-    
-    //std::cout << zeta <<"\n";
-    
-    if (zeta > 0.33) {
-        return "1";
-    }
-    else if (zeta < -0.33){
-        return "2";
-    }
-    else
-        return "3";
-    
+void WaterAnalysis::setRCutOff(double cutoff){
+    assert(cutoff > 0);
+    _rcutoff = cutoff;
 }
 
-void analyzeChiralityXYZ(xyzfile& snap, const Box& box){
+void WaterAnalysis::setAngleCutOff(double cutoff){
+    assert(cutoff > 0);
+    _anglecutoff = cutoff;
+}
+
+void WaterAnalysis::setSkipFrame(int skip){
+    assert(skip > 0);
+    _skip_frame = skip;
+}
+
+void WaterAnalysis::setTimeStep(double step){
+    _time_step = step;
+}
+
+int WaterAnalysis::getNumberOfBondBreakingEvents(){
+    int sum = 0;
+    for (auto& i : _bondBreakInfos)
+        sum += i.frames.size();
+    return sum;
+}
+
+void WaterAnalysis::_computeROO(){
+    double thetaa,thetab = 0;
+    std::pair<int,double> info;
+    long total_count = 0;
+    short ostar = -MOLSIZE;
     
-    int natoms = snap.n;
-    assert(natoms%4 == 0);
-    int nmolecules = natoms/4;
-    unsigned int k,l,m;
-    k=l=m=0;
+    trajAavg.resize(2*_skip_frame,corr_point_t(0,0));
+    trajBavg.resize(2*_skip_frame,corr_point_t(0,0));
+
     
-    for (int i=0; i<nmolecules; i++) {
-        coord_list_t x;
-        for (unsigned int j=0; j<4; j++) {
-            x.push_back(snap.x[k++]);
+    for (unsigned int i=0; i < _bondBreakInfos.size(); i++) {
+        _bondBreakInfos[i].trajA.resize(_bondBreakInfos[i].frames.size());
+        _bondBreakInfos[i].trajB.resize(_bondBreakInfos[i].frames.size());
+        if ( i%2 == 0 ){
+            ostar += MOLSIZE;
         }
-        std::string zeta = chiralityunwrap(x,box);
-        //this is very very inefficent
-        for (unsigned int j=0; j<4; j++) {
-            snap.type[l++] = zeta;
-            snap.x[m++] = x[j];
+        for (unsigned int j=0; j <_bondBreakInfos[i].frames.size(); j++) {
+            int frame = _bondBreakInfos[i].frames[j];
+            
+            short oa = _bondBreakInfos[i].oxygen_ids[j].first;
+            short ob = _bondBreakInfos[i].oxygen_ids[j].second;
+  
+            
+            for (int k = -_skip_frame; k < (int)_skip_frame; k++) {
+                int l = frame + k;
+                if (l < 0 || l >= _trajectory->size()) continue;
+                Snap* _snap = &(*_trajectory)[l];
+                coord_list_t* com = &(_snap->_center_of_mass_list);
+                
+                double ra = distance((*com)[ostar],
+                                     (*com)[oa], _snap->box);
+                double rb = distance((*com)[ostar],
+                                     (*com)[ob], _snap->box);
+                //std::cout << k << "\t" << ra << "\t" << rb << std::endl;
+                if (ra > 4.00 && rb > 4.00) continue;
+                thetaa = cosine_angle((*com)[ostar], (*com)[oa], (*com)[ostar+(i%2)+1], _snap->box);
+                thetab = cosine_angle((*com)[ostar], (*com)[ob], (*com)[ostar+(i%2)+1], _snap->box);
+                if ((ra < 4.00 && thetaa > COS50 && k <= 0) || (rb < 4.00 && thetab > COS50 && k > 0)){
+                    //info.first = k;
+                    //info.second = ra;_bondBreakInfos[i].trajA[j].push_back(info);
+                    //info.second = rb; _bondBreakInfos[i].trajB[j].push_back(info);
+                    
+                    assert(k+_skip_frame < trajAavg.size());
+                    trajAavg[k+_skip_frame].first++;
+                    trajAavg[k+_skip_frame].second += ra;
+                    
+                    trajBavg[k+_skip_frame].first++;
+                    trajBavg[k+_skip_frame].second += rb;
+                    
+                    total_count++;
+                }
+                        
+            }
+            
+            
+        }
+        if (total_count > BREAKINGEVENTS*2*_skip_frame){
+            std::cout << "I am going to break this\n";
+            break;
+        }
+        
+    }
+    
+    std::cout << (double) total_count /(16000*2*_skip_frame) << std::endl;
+    
+}
+
+void WaterAnalysis::_analyzeHydrogenBonds(){
+    assert(_bondedList.size() > 0);
+    _bondBreakInfos.clear();
+    _bondBreakInfos.resize(_bondedList[0].size());
+    
+    std::pair<short, short> ids;
+    
+    for (unsigned int i=0; i < _bondBreakInfos.size() ; i++){
+        for (unsigned int j=_skip_frame; j < _bondedList.size() - 1; j++) {
+            if ( _bondedList[j][i].size() == 0 || _bondedList[j+1][i].size() == 0) continue;
+            if (std::find(_bondedList[j+1][i].begin(), _bondedList[j+1][i].end(), _bondedList[j][i][0]) == _bondedList[j+1][i].end()){
+                _bondBreakInfos[i].frames.push_back(j);
+                ids.first = _bondedList[j][i][0];
+                ids.second = _bondedList[j+1][i][0]; //just pick the first oxygen
+                _bondBreakInfos[i].oxygen_ids.push_back(ids);
+            }
         }
     }
     
 }
 
+void WaterAnalysis::_computeHydrogenBonds(int i){
+
+    Snap* _snap = &(*_trajectory)[i];
+    coord_list_t* com = &(_snap->_center_of_mass_list);
+    double rcutsqd = _rcutoff*_rcutoff;
+    
+    unsigned nmolecules = (unsigned) (ceil((double) com->size()/MOLSIZE));
+    
+    unsigned_list2d_t hbond(2*nmolecules);
+
+    
+    for (unsigned int i=0; i<com->size(); i+= MOLSIZE) {
+        unsigned twomolid = 2*((unsigned) (floor ((double) i / (double) MOLSIZE))) ;
+        //std::cout << twomolid << "\t" << twomolid+1-1 << "\t" << twomolid+2-1 << "\n";
+        for (unsigned int j=0; j<com->size(); j+= MOLSIZE) {
+            if (i==j) continue;
+            double rsq = distancesq((*com)[i], (*com)[j], _snap->box);
+            if (rsq < rcutsqd) {
+                for (unsigned k=1;k<MOLSIZE;k++){
+                    double x = cosine_angle((*com)[i], (*com)[i+k], (*com)[j], _snap->box);
+                    if (x > _anglecutoff) {
+                        hbond[twomolid+k-1].push_back(j);
+                    }
+                }
+            }
+        }
+        
+    }
+    
+    _bondedList.push_back(hbond);
+    
+}
+
+void WaterAnalysis::_computeAllHydrogenBonds(){
+    _bondedList.clear();
+    for (unsigned int i=0; i<_trajectory->size(); i++) {
+        _computeHydrogenBonds(i);
+    }
+}
+
+void WaterAnalysis::compute(){
+    //_computeHydrogenBonds(0);
+    _computeAllHydrogenBonds();
+    _analyzeHydrogenBonds();
+    _computeROO();
+    _normalize();
+}
+
+void WaterAnalysis::_normalize(){
+    for (unsigned int i=0; i < trajBavg.size(); i++) {
+        if (trajBavg[i].first != 0) trajBavg[i].second /= (double) trajBavg[i].first;
+        if (trajAavg[i].first != 0) trajAavg[i].second /= (double) trajAavg[i].first;
+    }
+}
+
+void WaterAnalysis::printROO(){
+    for (int i=0; i<trajBavg.size(); i++) {
+        std::cout << _time_step*(i - _skip_frame) << "\t" << trajAavg[i].second << "\t" << trajBavg[i].second <<
+        "\t" << trajBavg[i].first << std::endl;
+    }
+}
+
+
+void WaterAnalysis::printBonded(){
+    for (unsigned int i=0; i<_bondedList.size(); i++) {
+        std::cout << i ;
+        for (unsigned int j=0; j<_bondedList[i][4].size(); j++) {
+            std::cout << "\t" << _bondedList[i][4][j];
+        }
+        std::cout << "\n";
+    }
+}
+
+void WaterAnalysis::printNumberHydrogenBonds(){
+    for (unsigned int i=0; i<_bondedList.size(); i++) {
+        unsigned nbond = 0;
+        for (auto& j : _bondedList[i]) nbond += j.size();
+        std::cout << i  << "\t" << nbond << "\n";
+    }
+}
 
 int main(int argc, const char * argv[]) {
     // insert code here...
-    std::cout << "Hello, World!\n";
-    
-    
-    const char* filename = "/Users/Folarin/Documents/vmd_views/water/initial_configt.xyz";
-    
-    Trajectory traj(filename,true,1,5);
-    
-    BondOrderParameter bop(traj,6);
-    bop.setRcutOff(3.2);
-    bop.setMaxNumberOfNearestNeighbors(4);
-    bop.setThirdOrderInvariants(true);
-    bop.compute();
-    std::cout << bop.getQl() << "\t" << bop.getWl() << std::endl;
-    bop.print();
-    
-    //test boost
-    /*accumulator_set<double, stats<tag::mean, tag::moment<2> > > acc;
-    
-    //push in some data
-    acc(1.2);
-    acc(2.3);
-    acc(3.4);
-    acc(4.5);
-    
-    //Display the results
-    std::cout << "Mean:\t" << mean(acc) << std::endl;
-    std::cout << "Moment:\t" << boost::accumulators::moment<2> (acc) << std::endl;
-    
-    
-    //Now test average and variance
-    OrderParameter o1("/Users/Folarin/Library/Developer/Xcode/DerivedData/Build/Products/Debug/logme.txt");
-    o1.computeAverageAndVariance(1);
-    
-    
-    std::cout <<"\n\nCorrelations\n\n";
-    o1.computeAutoCorrelation(1);
-    o1.printCorrelation();
-    */
+    //std::cout << "Hello, World!\n";
 
-    /*
-    xyzfile data;
-    Box box;
-    box.box_hi[0] = atof(argv[3]);
-    box.box_hi[1] = atof(argv[4]);
-    box.box_hi[2] = atof(argv[5]);
-    box.updatePeriod();
-
-   
-    const char* filename0 = argv[1];
-    const char* filename1 = argv[2];
-
-
-    xyztrajectory_t traj;
-    loadxyz(filename0, traj);
+    const char* filename = "/Users/Folarin/Documents/vmd_views/water/patchy_colloids/test_snaps/dump22f_2b.xyz";
     
-    std::vector<unsigned int> typecount(3,0), typecountmax(3,0);
-    std::vector<std::string> typematch(3,"1");
-    typematch[1] = "2"; typematch[2] = "3";
-
-    for (unsigned int i=0; i<traj.size(); i++){
-        analyzeChiralityXYZ(traj[i],box);
-        for (unsigned int j=0; j<3; j++){
-            typecount[j] = (int) std::count(traj[i].type.begin(),traj[i].type.end(),typematch[j]);
-            typecountmax[j] = std::max(typecount[j],typecountmax[j]);
-        }
-    }
-    typelog_t logtypes;
-    for (unsigned int i=0; i<typematch.size(); i++) logtypes[typematch[i]] = typecountmax[i];
-    VisualizerXYZ chiral(filename1);
-    chiral.setTypeMax(logtypes);
-    chiral.visualize(traj);
-    
-    
-    
-//    savexyz(filename1, traj);
-    std::cout << typecountmax[0] << "\t" << typecountmax[1] << "\t" << typecountmax[2] << "\n"; 
- 
-*/   
-    
+    Trajectory traj(filename,true,1,1);
+    WaterAnalysis analyze(traj);
+    analyze.compute();
+    //analyze.printNumberHydrogenBonds();
+    //analyze.printBonded();
+    //std::cout << analyze.getNumberOfBondBreakingEvents() << std::endl;
+    analyze.printROO();
     
     
     return 0;

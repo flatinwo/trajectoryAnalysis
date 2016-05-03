@@ -239,6 +239,7 @@ namespace trajectoryAnalysis {
                     xyz[0] = xi; xyz[1] = yi; xyz[2] = zi;
                     x.push_back(xyz);
                     system[nsnap]._center_of_mass_list.push_back(x[0]);
+                    system[nsnap]._type_list.push_back(typei);
                     x.clear();
                 }
             }
@@ -431,12 +432,12 @@ namespace trajectoryAnalysis {
             }
             *os << n << "\n\n";
             if (info.type.size() > 0) {
-                for (int j=0; j<n; j++){
+                for (unsigned int j=0; j<n; j++){
                     *os << info.type[j] << "\t" << xyztraj[i].x[j] << "\n";
                 }
             }
             else{
-                for (int j=0; j<n; j++) *os << "H\t" << xyztraj[i].x[j] << "\n";
+                for (unsigned int j=0; j<n; j++) *os << "H\t" << xyztraj[i].x[j] << "\n";
                 
             }
         }
@@ -467,12 +468,12 @@ namespace trajectoryAnalysis {
         
         *os << n << "\n\n";
         if (info.type.size() > 0) {
-            for (int i=0; i<n; i++){
+            for (unsigned int i=0; i<n; i++){
                 *os << info.type[i] << "\t" << x[i][0] << "\t" << x[i][1] << "\t" << x[i][2] << "\n";
             }
         }
         else{
-            for (int i=0; i<n; i++){
+            for (unsigned int i=0; i<n; i++){
                 *os << "H\t" << x[i][0] << "\t" << x[i][1] << "\t" << x[i][2] << "\n";
             }
         }

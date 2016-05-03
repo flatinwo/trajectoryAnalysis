@@ -91,6 +91,7 @@ namespace trajectoryAnalysis {
         
         int timestep;
         Box box;
+        std::vector<std::string> _type_list;
         coord_list_t _center_of_mass_list;
     };
     

@@ -53,7 +53,7 @@ namespace trajectoryAnalysis {
     }
     
     //return trajectory
-    trajectory_t Trajectory::getTrajectory(){
+    trajectory_t& Trajectory::getTrajectory(){
         return _trajectory;
     }
     
