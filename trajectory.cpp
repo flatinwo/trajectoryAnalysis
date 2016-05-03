@@ -76,7 +76,7 @@ namespace trajectoryAnalysis {
                 for (unsigned int k=0; k<3; k++) { //make this more generic by using size method
                     dr[k] = _trajectory[i+1]._center_of_mass_list[j][k] - _trajectory[i]._center_of_mass_list[j][k];
                     pbc(dr[k], _trajectory[i].box.box_period[k]);
-                    _trajectory[i+1]._center_of_mass_list[j][k] += dr[k];
+                    _trajectory[i+1]._center_of_mass_list[j][k] =  _trajectory[i]._center_of_mass_list[j][k] + dr[k];
                 }
                 
             }
@@ -107,7 +107,7 @@ namespace trajectoryAnalysis {
                     for (unsigned int l=0; l < _trajectory[i]._center_of_mass_list.size(); l++){
                         for (unsigned int k=0; k<3; k++) {
                             dr[k] = _trajectory[i+j]._center_of_mass_list[l][k] - _trajectory[i]._center_of_mass_list[l][k]; //write operator for this
-                            correlation[j].second = dr[k]*dr[k];
+                            correlation[j].second += dr[k]*dr[k];
                         }
                     }
                     correlation[j].first++;

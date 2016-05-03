@@ -27,7 +27,7 @@ using namespace boost::math;
 
 namespace trajectoryAnalysis {
     
-#define MAX_NUMBER_OF_NEIGHBORS 36
+#define MAX_NUMBER_OF_NEIGHBORS 50
     
     BondOrderParameter::BondOrderParameter(Trajectory& traj, int l):
     OrderParameter(traj),
