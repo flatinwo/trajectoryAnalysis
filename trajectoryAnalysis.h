@@ -19,6 +19,7 @@
 #include "bond_order_parameter.hpp"
 #include "correlations.h"
 #include "histogram_dynamic.h"
+#include "water_analysis.hpp"
 #include "tetrahedral_order_parameter.hpp"
 
 #endif /* trajectoryAnalysis_h */
