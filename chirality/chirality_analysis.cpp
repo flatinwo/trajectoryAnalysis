@@ -8,6 +8,7 @@
 
 #include "chirality_analysis.hpp"
 #include "spatial.hpp"
+#include <algorithm>
 
 namespace trajectoryAnalysis {
     ChiralityAnalysis::ChiralityAnalysis(int argc, const char* argv[]){

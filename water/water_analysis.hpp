@@ -12,6 +12,7 @@
 #include "struct_def.h"
 #include "trajectory.hpp"
 #include <stdio.h>
+#include <memory>
 
 namespace  trajectoryAnalysis {
 #define COS30 0.8660254
