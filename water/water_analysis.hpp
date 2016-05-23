@@ -60,7 +60,10 @@ namespace  trajectoryAnalysis {
         int _skip_frame;
         double _time_step;
         bool _requireThetaValues;
-        
+        double _rcutoff;
+        double _anglecutoff;
+      
+ 
         void _computeHydrogenBonds(int i=0);
         void _computeAllHydrogenBonds();
         void _analyzeHydrogenBonds();
@@ -71,11 +74,7 @@ namespace  trajectoryAnalysis {
         trajectory_t* _trajectory;
         
         corr_point_list_t trajAavg;
-        corr_point_list_t trajBavg;
-        
-        double _rcutoff;
-        double _anglecutoff;
-        
+        corr_point_list_t trajBavg;        
     };
 }
 #endif /* water_analysis_hpp */

@@ -23,7 +23,7 @@
 using namespace boost::accumulators;
 
 namespace trajectoryAnalysis {
-    WaterAnalysis::WaterAnalysis(Trajectory& traj):_traj(&traj),_skip_frame(50),_time_step(20.),_rcutoff(3.5),_anglecutoff(COS30){
+    WaterAnalysis::WaterAnalysis(Trajectory& traj):_skip_frame(50),_time_step(20.),_rcutoff(3.5),_anglecutoff(COS30),_traj(&traj){
         _trajectory = &_traj->getTrajectory();
         _requireThetaValues = false;
     }
@@ -79,7 +79,7 @@ namespace trajectoryAnalysis {
                 
                 for (int k = -_skip_frame; k < (int)_skip_frame; k++) {
                     int l = frame + k;
-                    if (l < 0 || l >= _trajectory->size()) continue;
+                    if (l < 0 || l >= (int)_trajectory->size()) continue;
                     Snap* _snap = &(*_trajectory)[l];
                     coord_list_t* com = &(_snap->_center_of_mass_list);
                     
@@ -96,7 +96,7 @@ namespace trajectoryAnalysis {
                         //info.second = ra;_bondBreakInfos[i].trajA[j].push_back(info);
                         //info.second = rb; _bondBreakInfos[i].trajB[j].push_back(info);
                         
-                        assert(k+_skip_frame < trajAavg.size());
+                        assert(k+_skip_frame < (int)trajAavg.size());
                         trajAavg[k+_skip_frame].first++;
                         trajAavg[k+_skip_frame].second += ra;
                         
@@ -199,7 +199,7 @@ namespace trajectoryAnalysis {
     
     void WaterAnalysis::printROO(){
         _openFiles();
-        for (int i=0; i<trajBavg.size(); i++) {
+        for (unsigned int i=0; i<trajBavg.size(); i++) {
             *_ofiles[0] << _time_step*(i - _skip_frame) << "\t" << trajAavg[i].second << "\t" << trajBavg[i].second <<
             "\t" << trajBavg[i].first << std::endl;
         }
