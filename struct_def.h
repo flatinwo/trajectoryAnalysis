@@ -81,6 +81,11 @@ namespace trajectoryAnalysis {
                 box_period[i] = box_hi[i] - box_lo[i];
         }
         
+        double getVolume(){
+            double vol = 1.;
+            for (auto& i : box_period) vol *= i;
+            return vol;
+        }
         
     };
     

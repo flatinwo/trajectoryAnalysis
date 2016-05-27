@@ -21,6 +21,17 @@ namespace trajectoryAnalysis {
         _box.box_hi[2] = atof(argv[5]);
         _box.updatePeriod();
         
+        _initialize();
+        
+    }
+    
+    ChiralityAnalysis::ChiralityAnalysis(const char* filename, Box& box){
+        _filein = filename;
+        _fileout = "chiralized" + std::string(filename);
+        _box = box;
+        _box.updatePeriod();
+        _initialize();
+        
     }
     
     void ChiralityAnalysis::_initialize(){
@@ -42,6 +53,7 @@ namespace trajectoryAnalysis {
             _analyzeChiralityXYZ(_traj[i]);
             fileEE << i << "\t" << _averageC << std::endl;
             
+            //allows for visualization with vmd by accounting for changing types on move)
             for (unsigned int j=0; j<3; j++){
                 _typecount[j] = (int) std::count(_traj[i].type.begin(),_traj[i].type.end(),_typematch[j]);
                 _typecountmax[j] = std::max(_typecount[j],_typecountmax[j]);
@@ -75,7 +87,9 @@ namespace trajectoryAnalysis {
             std::string zeta = _chiralityunwrap(x,zeta_d);
             _averageC += zeta_d;
             for (unsigned int j=0; j<4; j++) {
-                snap.type[l++] = zeta;
+                /*snap.type[l++] = zeta;*/
+                if (j==0 || j==3) snap.type[l++]=zeta+"1";
+                else snap.type[l++]=zeta+"2";
                 snap.x[m++] = x[j];
             }
         }

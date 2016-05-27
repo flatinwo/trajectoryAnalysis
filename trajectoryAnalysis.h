@@ -21,5 +21,8 @@
 #include "histogram_dynamic.h"
 #include "water_analysis.hpp"
 #include "tetrahedral_order_parameter.hpp"
+#include "radial_distribution_function.hpp"
+#include "chirality_analysis.hpp"
+#include "structure_chirality_analysis.hpp"
 
 #endif /* trajectoryAnalysis_h */

@@ -139,6 +139,10 @@ namespace trajectoryAnalysis {
             maxCorrelationLength = (unsigned int)_trajectory.size() - 1;
     }
     
+    void Trajectory::computeGofR(){
+        
+    }
+    
     
 #pragma mark OPERATORS
     
