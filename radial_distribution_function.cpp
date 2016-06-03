@@ -16,6 +16,7 @@
 //write a type converter from xyztrajectory_t and trajectory_t
 //set only allows distinct containers
 //maybe typedef boost
+//try with threads
 
 namespace trajectoryAnalysis {
     RadialDistributionFunction::RadialDistributionFunction(xyztrajectory_t& xyztraj, Box& box, double binsize):_trajx(&xyztraj),_box(&box),_bin_size(binsize){
