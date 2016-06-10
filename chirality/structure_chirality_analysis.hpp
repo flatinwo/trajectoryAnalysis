@@ -23,6 +23,8 @@ namespace trajectoryAnalysis {
         void refresh();
         void computeRDF();
         
+        void setBinSize(double);
+        
     protected:
         double _binsize;
         RadialDistributionFunction* _rdf;

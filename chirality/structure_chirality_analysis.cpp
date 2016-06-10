@@ -26,9 +26,14 @@ namespace trajectoryAnalysis {
     StructureChiralityAnalysis::~StructureChiralityAnalysis(){
     }
     
+    void StructureChiralityAnalysis::setBinSize(double bin){
+        assert(bin>0.);
+        _binsize = bin;
+    }
+    
     void StructureChiralityAnalysis::computeRDF(){
         analyze();
-        _rdf = new RadialDistributionFunction(_traj,_box);
+        _rdf = new RadialDistributionFunction(_traj,_box,_binsize);
         _rdf->addSimpleExcludeRule(testchiral);
         
         

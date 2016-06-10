@@ -21,8 +21,8 @@
 namespace trajectoryAnalysis{
     class RadialDistributionFunction{
     public:
-        RadialDistributionFunction(trajectory_t&, double binsize=0.05);
-        RadialDistributionFunction(xyztrajectory_t&, Box&,double binsize=0.05);
+        RadialDistributionFunction(trajectory_t&, double binsize=0.01);
+        RadialDistributionFunction(xyztrajectory_t&, Box&,double binsize=0.01);
         
         void compute();
         void print();
