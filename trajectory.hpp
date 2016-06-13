@@ -25,6 +25,7 @@ namespace trajectoryAnalysis {
     public:
         Trajectory();
         Trajectory(const char* filename, bool=false, unsigned int i=1, unsigned int=5);
+        Trajectory(const char* filename, FILETYPE=GRO, unsigned int i=1, unsigned int=4);
         ~Trajectory();
         
         unsigned int maxCorrelationLength;

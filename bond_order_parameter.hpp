@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include "order_parameter.hpp"
+#include "histogram_dynamic.h"
 #include <fstream>
 #include <memory>
 
@@ -39,6 +40,7 @@ namespace trajectoryAnalysis {
     protected:
         int _l;                                     //make this a vector also to accommodate several L values
         bool _requireThirdOrderInvaraints;          //should I compute third order invariants
+        bool _requireBinValues;
         component_list_t _Qlm;                      //make this a vector to accommodate several L values
         component_list_t _Wl_i;                     //ditto
         
@@ -47,6 +49,8 @@ namespace trajectoryAnalysis {
         double _Ql,_Wl;
         std::vector<double> _Qls;                   //Qls..
         std::vector<double> _Wls;                   //Wls..
+        std::vector<double> _qli;                   //local q'is
+        std::vector<double> _wli;                   //local w's
         
         void _computeWithRcutOff();
         void _computeWithMaxNeighbors();            //also considered as maximum number of bonds
@@ -55,14 +59,26 @@ namespace trajectoryAnalysis {
         double _ThreeJSymbol(int, int, int, int, int, int); //well-defined Wigner-3j symbol
         
         void _computeQl();
+        virtual void _computeql_i(unsigned int);
+        void _computeql();
+        
         void _computeWl();
         void _computeWl_i(unsigned int);
+        virtual void _computewl_i(unsigned int);
+        
+        void _tallyLocals();
+        
+        
         void _resize();
         void _refresh();
         void _refresh(unsigned int);
+        void _update();
         
         void _openFiles();
         void _closeFiles();
+        
+        stats_utils::HistogramDynamic<double> _qHist; //can make this a vector of vectors
+        stats_utils::HistogramDynamic<double> _wHist; //can make this a vector of vectors
         
     };
 }

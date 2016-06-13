@@ -43,6 +43,8 @@ namespace trajectoryAnalysis {
     
     typedef std::map<std::string, unsigned int> typelog_t;
     
+    enum FILETYPE {XYZ=0,GRO=1};
+    
     
     //overloaded operators
     
@@ -54,6 +56,13 @@ namespace trajectoryAnalysis {
         return z;
     }
     
+    inline component_t operator+(const component_t& x, const component_t& y){
+        return {x.real()+y.real(),x.imag()+y.imag()};
+    }
+    
+    inline component_t operator+=(const component_t& lhs, const component_t& rhs){
+        return {lhs.real()+rhs.real(),lhs.imag()+rhs.imag()};
+    }
     
     struct Box{
         

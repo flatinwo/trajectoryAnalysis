@@ -90,6 +90,14 @@ namespace trajectoryAnalysis {
         for (auto& n :_number_of_neighbors) n = 0;
     }
     
+    /*void OrderParameter::_refresh(unsigned int i){
+        assert(false);
+    }*/
+    
+    void OrderParameter::_refresh(){
+        assert(false);
+    }
+    
     void OrderParameter::compute(){
         int virtual_function_overriden=0;
         assert(virtual_function_overriden);
@@ -104,6 +112,18 @@ namespace trajectoryAnalysis {
         _nearest_neighbors.resize(_snap->_center_of_mass_list.size(),
                                   double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
         _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0.);
+        _localflag = false;
+    }
+    
+    void OrderParameter::setCalcType(Calc_t mode){
+        _mode = mode;
+        if (_mode==LOCAL || _mode==GLOBALANDLOCAL) _localflag = true;
+        _update();
+    }
+    
+    void OrderParameter::_update(){
+        _refresh();
+        assert(false);
     }
     
     /*

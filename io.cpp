@@ -256,6 +256,81 @@ namespace trajectoryAnalysis {
     }
     
     
+    void loadgrofancy(const char* filename, trajectory_t& system, unsigned int index, unsigned int every){
+        xyz_info* info = new xyz_info();
+        
+        std::istream* is;
+        std::ifstream ifs;
+        
+        if (info->instream != 0x0){
+            is = info->instream;
+        }
+        else{
+            ifs.open(filename);
+            is = &ifs;
+        }
+        
+        assert(is->good());
+        assert(index > 0);
+        assert(every > 0);
+        
+        int nsnap = 0;
+        std::string str, word;
+        
+        while (std::getline(*is, str)) {
+            std::getline(*is,str); //get first line
+            system.push_back(Snap());
+            
+            //box reference
+            Box& box = system[nsnap].box;
+            
+            //get total number of particles
+            int n = 0;
+            std::istringstream iss(str.c_str());
+            iss >> n;
+            
+            //std::cout << str << "\t" << n << std::endl;
+            assert(n>0);
+            
+            box.updatePeriod();
+            
+            system[nsnap].timestep = nsnap;
+            
+            coord_list_t x;
+            info->type.clear();
+            
+            double xi, yi, zi;
+            for (int i=0; i<n; i++) {
+                std::string typei,junk;
+                std::getline(*is,str);
+                if ((i%every) == index-1 ){
+                    std::istringstream is1(str);
+                    is1 >> junk >>  typei >> junk >> xi >> yi >> zi;
+                    info->type.push_back(typei);
+                    coord_t xyz(3), rxyz(3);
+                    xyz[0] = xi; xyz[1] = yi; xyz[2] = zi;
+                    x.push_back(xyz);
+                    system[nsnap]._center_of_mass_list.push_back(x[0]);
+                    system[nsnap]._type_list.push_back(typei);
+                    x.clear();
+                }
+            }
+            std::getline(*is,str);
+            std::istringstream is1(str);
+            is1 >> box.box_hi[0] >> box.box_hi[1] >> box.box_hi[2];
+            box.updatePeriod();
+            nsnap++;
+        }
+        
+        if (info->instream == 0x0) {
+            ifs.close();
+        }
+        
+        delete info;
+        
+    }
+
+    
     void loadxyz(const char* filename, trajectory_t& system, arg_t arg){
         xyz_info* info = (xyz_info*) arg;
         xyz_info temp_info;

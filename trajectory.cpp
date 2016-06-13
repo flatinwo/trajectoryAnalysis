@@ -34,6 +34,15 @@ namespace trajectoryAnalysis {
 
     }
     
+    Trajectory::Trajectory(const char* filename, FILETYPE type, unsigned int index, unsigned int every){
+        if (type==GRO) loadgrofancy(filename,_trajectory,index,every);
+        else { std::cerr << "Unknown filetype\n"; exit(-1);}
+        
+        //compute time step and maximum correlation length
+        computeTimeStep();
+        computeMaxCorrelationLength();
+    }
+    
     
     //destructor
     Trajectory::~Trajectory(){

@@ -24,5 +24,6 @@
 #include "radial_distribution_function.hpp"
 #include "chirality_analysis.hpp"
 #include "structure_chirality_analysis.hpp"
+#include "averaged_bond_order_parameter.hpp"
 
 #endif /* trajectoryAnalysis_h */

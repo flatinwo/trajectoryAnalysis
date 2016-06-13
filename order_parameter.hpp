@@ -34,6 +34,7 @@ namespace trajectoryAnalysis {
         enum Calc_t {GLOBAL, LOCAL, GLOBALANDLOCAL};
         
         void setRcutOff(double);
+        void setCalcType(Calc_t mode);
         virtual void setMaxNumberOfNearestNeighbors(unsigned int);
         
         virtual void compute();
@@ -54,11 +55,14 @@ namespace trajectoryAnalysis {
         Snap* _snap;
         Calc_t _mode;
         coord_t _coord;
+        bool _localflag;
         
         void _initialize();
         void _computeNearestNeighbors();
         void _refreshNeighbors();
-        void _refresh(unsigned int);
+        //virtual void _refresh(unsigned int);
+        virtual void _refresh();
+        virtual void _update();
         
         //file operations
         std::vector< std::unique_ptr<std::ofstream> > _ofiles;
