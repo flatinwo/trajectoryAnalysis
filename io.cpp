@@ -242,6 +242,11 @@ namespace trajectoryAnalysis {
                     system[nsnap]._type_list.push_back(typei);
                     x.clear();
                 }
+                if (str.empty()){
+                    system.pop_back();
+                    delete info;
+                    return;
+                }
             }
             //std::getline(*is,str);
             nsnap++;
@@ -314,8 +319,21 @@ namespace trajectoryAnalysis {
                     system[nsnap]._type_list.push_back(typei);
                     x.clear();
                 }
+                
+                if (str.empty()){
+                    system.pop_back();
+                    delete info;
+                    return;
+                }
+
             }
             std::getline(*is,str);
+            if (str.empty()){
+                system.pop_back();
+                delete info;
+                return;
+            }
+
             std::istringstream is1(str);
             is1 >> box.box_hi[0] >> box.box_hi[1] >> box.box_hi[2];
             box.updatePeriod();
