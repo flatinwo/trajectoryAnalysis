@@ -18,6 +18,7 @@
 
 //set all calculation flags then output all results
 //have default flags
+//also considering adding an exclude rule for neighbors
 
 namespace trajectoryAnalysis {
     
@@ -34,6 +35,7 @@ namespace trajectoryAnalysis {
         enum Calc_t {GLOBAL, LOCAL, GLOBALANDLOCAL};
         
         void setRcutOff(double);
+        void setRmin(double);
         void setCalcType(Calc_t mode);
         virtual void setMaxNumberOfNearestNeighbors(unsigned int);
         
@@ -44,6 +46,7 @@ namespace trajectoryAnalysis {
     protected:
         Trajectory* _trajectory;
         double _rcutoff;                            //maximum distance for neighbors
+        double _rminsq;                             //set _rminsq
         coord_list_t _data;
         
         unsigned_list_t _number_of_neighbors;       //count of number of neighbors
@@ -71,6 +74,7 @@ namespace trajectoryAnalysis {
         
         //virtual void _computeWithRcutOff(){};
         //virtual void _computeWithMaxNeighbors(){};            //also considered as maximum number of bonds
+        
         
         void _restructureData();
 

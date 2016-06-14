@@ -51,6 +51,9 @@ namespace trajectoryAnalysis {
 #pragma mark SETS
     void OrderParameter::setRcutOff(double rcutoff){
         assert(rcutoff > 0.);
+        double minperiod =
+        *(std::min_element(_snap->box.box_period.begin(), _snap->box.box_period.end()));
+        assert(rcutoff < 0.5*minperiod);
         _rcutoff = rcutoff;
     }
     
@@ -59,6 +62,12 @@ namespace trajectoryAnalysis {
         _max_number_of_neighbors = n_nghbrs;
         _useMaxNumberOfNeighbors = true;
         
+    }
+    
+    void OrderParameter::setRmin(double min){
+        assert(min > 0);
+        assert(min < _rcutoff);
+        _rminsq = min*min;
     }
     
 #pragma mark COMPUTES
@@ -72,7 +81,7 @@ namespace trajectoryAnalysis {
             for (unsigned int j=0; j<com->size(); j++) {
                 if (i==j) continue;
                 double rsq = distancesq((*com)[i], (*com)[j], _snap->box);
-                if (rsq < rcutsqd) {
+                if (rsq < rcutsqd && rsq > _rminsq) {
                     _nearest_neighbors[i][k].first = rsq;
                     _nearest_neighbors[i][k].second = j;
                     k++;
@@ -113,6 +122,7 @@ namespace trajectoryAnalysis {
                                   double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
         _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0.);
         _localflag = false;
+        _rminsq = 0;
     }
     
     void OrderParameter::setCalcType(Calc_t mode){
