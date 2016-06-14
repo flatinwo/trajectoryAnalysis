@@ -54,6 +54,8 @@ namespace trajectoryAnalysis {
             _wHist.insert(-0.25,0.0);
             _wHist.insert(0.25,0.0);
         }
+        
+        _update();
     }
     
     BondOrderParameter::~BondOrderParameter(){
@@ -174,7 +176,7 @@ namespace trajectoryAnalysis {
         for (auto& m : _qlm_i[i]) normalization += std::norm(m); //computed twice with _compute_qli fix
         _Wl_i[i] /= std::pow(normalization, 1.5);
         _wHist.insert(_Wl_i[i].real());
-        _wli[i] += _Wl_i[i].real();
+        if (_localflag) _wli[i] += _Wl_i[i].real();
     }
     
     //compute Harmonics for system
@@ -227,7 +229,7 @@ namespace trajectoryAnalysis {
         for (auto& m : _qlm_i[i]) normalization += std::norm(m); //computed twice with _compute_qli fix
         _Wl_i[i] /= std::pow(normalization, 1.5);
         _wHist.insert(_Wl_i[i].real());
-        _wli[i] += _Wl_i[i].real();
+        if (_localflag) _wli[i] += _Wl_i[i].real();
         
     }
     
@@ -261,7 +263,7 @@ namespace trajectoryAnalysis {
             }
         }
         
-        if (_requireBinValues){
+        if (_requireBinValues && _localflag){
             *_ofiles[4] << _qHist << std::endl;
             *_ofiles[5] << _wHist << std::endl;
         }
@@ -311,7 +313,7 @@ namespace trajectoryAnalysis {
             _ofiles[3].reset(new std::ofstream(os.str().c_str()));
         }
         
-        if (_requireBinValues){
+        if (_requireBinValues && _localflag){
             _ofiles.resize(6);
             os.str("");os.clear();
             os << "localqHistogram_" << _l << ".txt"; //seems like ofstream does not like short names

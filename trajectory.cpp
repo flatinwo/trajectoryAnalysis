@@ -20,6 +20,7 @@ namespace trajectoryAnalysis {
     }
     
     //constructor 2
+    //overlap true
     Trajectory::Trajectory(const char* filename, bool fancy, unsigned int index, unsigned int every){
 
 	_time_step = 100; _unfolded = false; maxCorrelationLength=0;

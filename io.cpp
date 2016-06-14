@@ -348,7 +348,8 @@ namespace trajectoryAnalysis {
         
     }
 
-    
+
+    //to be deprecated, same as loadxyzfancy with specific parameters
     void loadxyz(const char* filename, trajectory_t& system, arg_t arg){
         xyz_info* info = (xyz_info*) arg;
         xyz_info temp_info;
