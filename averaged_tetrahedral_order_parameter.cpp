@@ -10,7 +10,6 @@
 #include "spatial.hpp"
 
 namespace trajectoryAnalysis {
-
     
 #define THREEOVEREIGHT 0.3750000000
 #define ONEOVERTHREE   0.3333333333

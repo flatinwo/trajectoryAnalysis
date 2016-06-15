@@ -20,7 +20,7 @@ namespace trajectoryAnalysis{
     class AveragedTetrahedralOrderParameter : public TetrahedralOrderParameter{
     public:
         AveragedTetrahedralOrderParameter(Trajectory&);
-        ~AveragedTetrahedralOrderParameter();
+       // ~AveragedTetrahedralOrderParameter();
         
     private:
         coord_list_t _localqs;
