@@ -1,3 +1,4 @@
+
 //
 //  main.cpp
 //  trajectoryAnalysis
@@ -17,8 +18,40 @@ int main(int argc, const char * argv[]) {
     // insert code here...
     //std::cout << "Hello, World!\n";
 
-    //const char* filename = "/Users/Folarin/Documents/vmd_views/water/patchy_colloids/test_snaps/dump22f_2b.xyz";
-    const char* filename = "/Users/Folarin/Documents/Tests/testme5.xyz";
+    //const char* filename = "/Users/Folarin/Documents/Tests/gro_files/test_ql/em_conf_240.gro";
+    
+    const char* filename = "/Users/Folarin/Documents/Tests/xyz_files/data2.xyz";
+    
+    Trajectory traj(filename,true,1,5);
+    
+    /*BondOrderParameter bop(traj,6);
+    bop.setCalcType(OrderParameter::Calc_t::LOCAL);
+    bop.setRcutOff(5.0);
+    bop.setMaxNumberOfNearestNeighbors(4);
+    bop.compute();
+    bop.print();*/
+    
+    AveragedTetrahedralOrderParameter analyzeq(traj);
+    analyzeq.setRcutOff(5.0);
+    analyzeq.setRmin(2.00);
+    analyzeq.compute();
+    analyzeq.print();
+    
+    /*Trajectory Ensemble(filename,FILETYPE::GRO,1,4);
+    AveragedBondOrderParameter BOP(Ensemble,6);
+    BOP.setCalcType(OrderParameter::Calc_t::LOCAL);
+    BOP.setRcutOff(0.45);
+    BOP.setMaxNumberOfNearestNeighbors(4);
+    BOP.compute();
+    BOP.print();*/
+    
+    std::cout << "Hello world\n";
+    
+    
+    /*const char* filename = "/Users/Folarin/Documents/Tests/testme5.xyz";
+    
+    
+    
     Box mybox;
     mybox.box_lo = coord_t(3,0.);
     mybox.box_hi[0] = 16.176239;
@@ -26,7 +59,7 @@ int main(int argc, const char * argv[]) {
     mybox.box_hi[2] = 16.401357;
     
     StructureChiralityAnalysis mychiral(filename,mybox);
-    mychiral.computeRDF();
+    mychiral.computeRDF();*/
     
     
     return 0;
