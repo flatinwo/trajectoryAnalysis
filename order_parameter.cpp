@@ -31,7 +31,7 @@ using namespace boost::accumulators;
 
 namespace trajectoryAnalysis {
     
-#define MAX_NUMBER_OF_NEIGHBORS 50
+#define MAX_NUMBER_OF_NEIGHBORS 100
     
     /*OrderParameter::OrderParameter(const char* filename){
         //load(filename, _data);
