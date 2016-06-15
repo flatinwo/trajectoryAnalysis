@@ -17,7 +17,8 @@ namespace trajectoryAnalysis {
     
     AveragedTetrahedralOrderParameter::AveragedTetrahedralOrderParameter(Trajectory& traj):
     TetrahedralOrderParameter(traj){
-         _localqs.resize(_snap->_center_of_mass_list.size(),coord_t(6,0));
+	  _dummyclt.resize(6,0.);
+         _localqs.resize(_snap->_center_of_mass_list.size(),_dummyclt);
     }
     
     void AveragedTetrahedralOrderParameter::_computeQ(unsigned int i){
