@@ -41,9 +41,8 @@ namespace trajectoryAnalysis {
         std::vector<double> _Qframe;
         
         void _computeWithMaxNeighbors();            //also considered as maximum number of bonds
-        void _computeQ(unsigned int);
-        
-        void _updateQframe();
+        virtual void _computeQ(unsigned int);
+        virtual void _updateQframe();
         
         void _resize();
         
