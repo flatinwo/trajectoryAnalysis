@@ -52,8 +52,8 @@ namespace trajectoryAnalysis {
         std::vector<double> _qli;                   //local q'is
         std::vector<double> _wli;                   //local w's
         
-        void _computeWithRcutOff();
-        void _computeWithMaxNeighbors();            //also considered as maximum number of bonds
+        virtual void _computeWithRcutOff();
+        virtual void _computeWithMaxNeighbors();            //also considered as maximum number of bonds
         
         void _computeHarmonics(unsigned int, unsigned int);
         double _ThreeJSymbol(int, int, int, int, int, int); //well-defined Wigner-3j symbol

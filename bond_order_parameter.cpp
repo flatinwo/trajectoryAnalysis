@@ -43,7 +43,7 @@ namespace trajectoryAnalysis {
 
         
         if (_requireBinValues){
-            _qHist.setBinSize(0.01);
+            _qHist.setBinSize(0.001);
             _qHist.setToNormalize(true);
             _qHist.insert(0.0,0.0);
             _qHist.insert(1.0,0.0);

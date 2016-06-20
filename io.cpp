@@ -19,6 +19,8 @@
 #include <assert.h>
 #include <stack>
 
+//implement strides for calculations
+
 namespace trajectoryAnalysis {
     
     //Brief: Load raw coordinates

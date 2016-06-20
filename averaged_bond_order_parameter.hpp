@@ -20,7 +20,9 @@ namespace trajectoryAnalysis {
     protected:
         void _computeql_i(unsigned int);
         void _average(unsigned int);
-
+        
+        void _computeWithMaxNeighbors();
+        void _computeWithRcutOff();
     };
 }
 

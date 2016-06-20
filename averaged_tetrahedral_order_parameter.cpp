@@ -11,6 +11,8 @@
 
 namespace trajectoryAnalysis {
     
+    //try averaging over cosine and sine terms, like e(itheta)
+    
 #define THREEOVEREIGHT 0.3750000000
 #define ONEOVERTHREE   0.3333333333
 #define COUNT 1
@@ -23,12 +25,13 @@ namespace trajectoryAnalysis {
     
     void AveragedTetrahedralOrderParameter::_computeQ(unsigned int i){
         coord_list_t* com = &(_snap->_center_of_mass_list);
+        unsigned int myncount=0;
         for (unsigned int j=0; j < _max_number_of_neighbors - 1; j++){
             for (unsigned int k=j+1; k < _max_number_of_neighbors; k++) {
                 unsigned int indj = _nearest_neighbors[i][j].second;
                 unsigned int indk = _nearest_neighbors[i][k].second;
                 double x = cosine_angle((*com)[i], (*com)[indj], (*com)[indk], _snap->box);
-                _localqs[i][k] = x + ONEOVERTHREE;
+                _localqs[i][myncount++] = x + ONEOVERTHREE;
             }
         }
     }
@@ -41,9 +44,8 @@ namespace trajectoryAnalysis {
             for (unsigned int k=0; k<_dummyclt.size(); k++)_dummyclt[k] += _localqs[indj][k];
 
         }
-        double maxnumsq = (double) (_max_number_of_neighbors+COUNT);
-        maxnumsq *= maxnumsq;
-        for (auto& j : _localqs[i] ) _sum += (j*j)/maxnumsq;
+        double maxnum = (double) ((_max_number_of_neighbors+COUNT));
+        for (auto& j : _localqs[i] ) _sum += (j*j)/maxnum;
     }
     
 
