@@ -59,7 +59,6 @@ namespace trajectoryAnalysis {
     
     //destructor
     Trajectory::~Trajectory(){
-        if (_Fskts!=nullptr && _computeFskt) _printFskt();
         if (_Fskts!=nullptr) delete _Fskts;
         if (_ks !=nullptr) delete _ks;
         if (_vanHovefxn != nullptr) delete _vanHovefxn;
@@ -266,7 +265,11 @@ namespace trajectoryAnalysis {
         
     }
     
-    void Trajectory::_printFskt(){
+    void Trajectory::printFskt(){
+        if (_Fskts==nullptr){
+            std::cerr << "Fskt has not been computed\n";
+            exit(-1);
+        }
         
         for (unsigned int i=0; i<_Fskts->size(); i++) {
             std::string str="Fskt"+ std::to_string((*_ks)[i])+".dat";

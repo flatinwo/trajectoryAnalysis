@@ -48,6 +48,8 @@ namespace trajectoryAnalysis {
         void computeMeanSquaredDisplacement();
         void computeGofR();
         
+        void printFskt();
+        
         friend std::ostream& operator << (std::ostream&, const Trajectory&);
         
     protected:
@@ -60,7 +62,6 @@ namespace trajectoryAnalysis {
         
         void computeTimeStep();
         void computeMaxCorrelationLength();
-        void _printFskt();
         
         coord_t _correlation;
         
