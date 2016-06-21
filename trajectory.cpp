@@ -186,7 +186,7 @@ namespace trajectoryAnalysis {
         coord_t dr(3,0.);
         double deltar=0.;
         for (unsigned int i=0; i < _trajectory.size(); i++) {
-            for (unsigned int j=0; j < maxCorrelationLength; j++) {
+            for (unsigned int j=1; j < maxCorrelationLength; j++) {
                 if (i+j >= _trajectory.size())
                     continue;
                 else{
@@ -201,6 +201,7 @@ namespace trajectoryAnalysis {
                             assert(_Fskts->size()==_ks->size());
                             for (unsigned int f=0; f<_Fskts->size();f++) {
                                 double kdeltar = (*_ks)[f]*sqrt(deltar);
+                                if (kdeltar < SMALL) kdeltar=SMALL;
                                 (*_Fskts)[f][j] += sin(kdeltar)/kdeltar;
                             }
                         }
@@ -222,7 +223,7 @@ namespace trajectoryAnalysis {
         if (_computeFskt) {
             for (unsigned int f=0; f<_Fskts->size();f++) {
                 for (unsigned int j=1; j<(*_Fskts)[f].size(); j++) {
-                     (*_Fskts)[f][j] /= (normalization*correlation[j].first);
+                     (*_Fskts)[f][j] *= (normalization/correlation[j].first);
                 }
             }
         }
