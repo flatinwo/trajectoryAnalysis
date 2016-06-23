@@ -215,7 +215,8 @@ namespace trajectoryAnalysis {
         _correlation.clear();
         double normalization = 1./(double) _trajectory[0]._center_of_mass_list.size();
         
-        for (auto it=correlation.begin(); it != correlation.end(); ++it) {
+        _correlation.push_back(0.); //origin
+        for (auto it=correlation.begin()+1; it != correlation.end(); ++it) {
             _correlation.push_back((it->second / (double) it->first)*normalization);
         }
         

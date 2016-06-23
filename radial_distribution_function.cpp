@@ -17,6 +17,7 @@
 //set only allows distinct containers
 //maybe typedef boost
 //try with threads
+//or modify for Trajectory
 
 namespace trajectoryAnalysis {
     RadialDistributionFunction::RadialDistributionFunction(xyztrajectory_t& xyztraj, Box& box, double binsize):_trajx(&xyztraj),_box(&box),_bin_size(binsize){
