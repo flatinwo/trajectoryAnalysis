@@ -267,6 +267,20 @@ namespace trajectoryAnalysis {
         
     }
     
+    Trajectory operator+(const Trajectory& rhs1, const Trajectory& rhs2){
+        Trajectory trajr = rhs1;
+        
+        if (rhs1._trajectory[0]._center_of_mass_list.size() != rhs2._trajectory[0]._center_of_mass_list.size()) {
+            std::cerr << "Warning! Number of atoms changed on combining trajectories\n";
+        }
+        
+        trajr._trajectory.insert(trajr._trajectory.end(), rhs2._trajectory.begin(), rhs2._trajectory.end());
+        
+        trajr.computeTimeStep();
+        trajr.computeMaxCorrelationLength();
+        return trajr;
+    }
+    
     void Trajectory::printFskt(){
         if (_Fskts==nullptr){
             std::cerr << "Fskt has not been computed\n";

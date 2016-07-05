@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <string>
+#include "trajectory.hpp"
 
 
 namespace trajectoryAnalysis{
@@ -52,6 +53,10 @@ namespace trajectoryAnalysis{
     void loadxyz(const char*, xyzfile&);
     void loadxyz(std::istream&, xyzfile&);
     void loadxyz(const char*, xyztrajectory_t&);
+    
+    
+    Trajectory getCombinedTrajectory(const char* filename);
+
     
     void savexyz(const char* filename, coord_list_t& x, xyz_info&);
     void savevarxyz(const char* filename, coord_list_t& x, xyz_info&);

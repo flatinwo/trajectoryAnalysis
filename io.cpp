@@ -23,6 +23,34 @@
 
 namespace trajectoryAnalysis {
     
+    /**
+     \brief Combines all trajectories in a filename
+     */
+    Trajectory getCombinedTrajectory(const char* filename){
+        std::vector<std::string> filepaths;
+        std::ifstream datafile(filename);
+        
+        if (datafile.is_open()) {
+            std::cerr << filename << " is now open...\n";
+            std::string str;
+            while (datafile >> str) filepaths.push_back(str);
+        }
+        else{
+            std::cerr << "Unable to open to file " << filename << std::endl;
+            std::exit(-1);
+        }
+        
+        assert(filepaths.size()>0);
+        Trajectory traj(filepaths[0].c_str(),true,1,5);
+        for (unsigned int i=1; i<filepaths.size(); i++) {
+            Trajectory temp(filepaths[i].c_str(),true,1,5);
+            traj = traj + temp;
+        }
+        
+        return traj;
+    }
+
+    
     //Brief: Load raw coordinates
     void load(const char* filename, coord_list_t& x, arg_t arg){
         

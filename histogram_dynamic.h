@@ -34,6 +34,7 @@ namespace stats_utils {
             _max = rhs._max;
             _inc = rhs._inc;
             _is_firsttime = rhs._is_firsttime;
+            _to_normalize = rhs._to_normalize;
         }
         
         //get size of each bin

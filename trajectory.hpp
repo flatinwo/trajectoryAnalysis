@@ -33,6 +33,8 @@ namespace trajectoryAnalysis {
         Trajectory(const char* filename, FILETYPE=GRO, unsigned int i=1, unsigned int=4);
         ~Trajectory();
         
+        friend Trajectory operator+(const Trajectory& rhs1, const Trajectory& rhs2);
+        
         unsigned int maxCorrelationLength;
         
         int getNumberOfSnaps();

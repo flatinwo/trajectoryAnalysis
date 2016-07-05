@@ -17,6 +17,19 @@
 
 namespace trajectoryAnalysis {
     
+    struct tHQs {
+        tHQs(double rmaxsqd):_rmaxsqd(rmaxsqd){
+            _numberstats = std::make_pair(0.,0.);
+            _QHist = stats_utils::HistogramDynamic<double>(0.01,true);
+        }
+        
+        double _rmaxsqd;
+        corr_point_t _numberstats;
+        std::vector<double> _Qs;
+        std::vector<double> _Qframe;
+        stats_utils::HistogramDynamic<double> _QHist;
+    };
+    
     /**
      \brief A derived class to perform specific calculations on/for Tetrahedral order parameters
             Value should range between -3 and +1.
@@ -28,6 +41,8 @@ namespace trajectoryAnalysis {
         ~TetrahedralOrderParameter();
         
         void setMaxNumberOfNearestNeighbors(unsigned int);
+        void setPositionTetrahedrality(bool);
+        void addRmax(double);
         
         double getQ();
         
@@ -36,13 +51,24 @@ namespace trajectoryAnalysis {
         
     protected:
         double _Q;
+        double_unsigned_pair_t _condition;
+        
+        std::vector<tHQs>* _tHQs;
+        std::vector<short> _counts; 
+        
         bool _requireBinQvalues;
+        bool _requirePositionValues;
+        
+        
         std::vector<double> _Qs;
         std::vector<double> _Qframe;
         
         void _computeWithMaxNeighbors();            //also considered as maximum number of bonds
+        
         virtual void _computeQ(unsigned int);
         virtual void _updateQframe();
+        
+        void _computeQR(unsigned int);
         
         void _resize();
         
