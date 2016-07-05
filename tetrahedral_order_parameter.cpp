@@ -33,7 +33,7 @@ namespace trajectoryAnalysis {
         _requirePositionValues = false;
         _tHQs = nullptr;
         _condition.first=0.;
-        _condition.second=INT_MAX;
+        _condition.second=std::numeric_limits<int>::max();
         
         if (_requireBinQvalues){
             _QHist.setBinSize(0.01);
