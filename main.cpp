@@ -21,28 +21,41 @@ int main(int argc, const char * argv[]) {
     //const char* filename = "/Users/Folarin/Documents/Tests/gro_files/test_ql/em_conf_240.gro";
     //const char* filename = "/Users/Folarin/Documents/Tests/LJ/dump-npt.gro";
     
-    const char* filename = "/Users/Folarin/Documents/Tests/xyz_files/testFskt.xyz";
+    const char* filename = "/Users/Folarin/Documents/Tests/xyz_files/filenames";
     
-    Trajectory traj(filename,true,1,5);
-    traj.setComputeFskt(true,4.0);
+
+    
+    Trajectory traj = getCombinedTrajectory(filename);
+    
+    
+    
+    /*traj.setComputeFskt(true,4.0);
     traj.computeMeanSquaredDisplacement();
     traj.printFskt();
     std::ofstream ofile("MSD.dat");
     ofile << traj;
-    ofile.close();
+    ofile.close();*/
     
     /*BondOrderParameter bop(traj,6);
     bop.setCalcType(OrderParameter::Calc_t::LOCAL);
     bop.setRcutOff(5.0);
     bop.setMaxNumberOfNearestNeighbors(4);
     bop.compute();
-    bop.print();
+    bop.print();*/
     
-    AveragedTetrahedralOrderParameter analyzeq(traj);
+    TetrahedralOrderParameter analyzeq(traj);
     analyzeq.setRcutOff(5.0);
     analyzeq.setRmin(2.00);
+    
+    /*analyzeq.setPositionTetrahedrality(true);
+    //analyzeq.addRmax(1.25);
+    analyzeq.addRmax(1.50);
+    analyzeq.addRmax(1.75);
+    analyzeq.addRmax(2.00);
+    analyzeq.addRmax(2.25);*/
+    
     analyzeq.compute();
-    analyzeq.print();*/
+    analyzeq.print();
     
     /*Trajectory Ensemble(filename,FILETYPE::GRO,1,4);
     AveragedBondOrderParameter BOP(Ensemble,6);
