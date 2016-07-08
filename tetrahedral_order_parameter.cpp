@@ -66,6 +66,7 @@ namespace trajectoryAnalysis {
         }
     }
     
+    //fix to prevent adding rmax of the same value
     void TetrahedralOrderParameter::addRmax(double rmax){
         assert(_tHQs != nullptr);
         assert(rmax > 0.);
@@ -267,8 +268,7 @@ namespace trajectoryAnalysis {
             }
             
             std::ofstream os("number_info.txt");
-            for (unsigned int j=0; j<_tHQs->size();j++) {
-                tHQs& i = (*_tHQs)[j];
+            for (auto& i :*_tHQs){
                 os << sqrt(i._rmaxsqd) << "\t" << i._numberstats.second/((double)i._numberstats.first) << std::endl;
             }
             os.close();
