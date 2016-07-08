@@ -153,11 +153,12 @@ namespace trajectoryAnalysis {
                                       std::bind2nd(std::less_equal<double_unsigned_pair_t>(),_condition));
             assert(_counts[j]<=4);
             //assert(_counts[j]>=2);
-            if (_counts[j]<=2) continue;
             
             //update stats for each _tHQ
             (*_tHQs)[j]._numberstats.first++;
             (*_tHQs)[j]._numberstats.second+=_counts[j];
+            
+            if (_counts[j]<2) continue;
             
             
             neighbors=sum=0.;
