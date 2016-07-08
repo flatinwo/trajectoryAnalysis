@@ -160,7 +160,6 @@ namespace trajectoryAnalysis {
             
             if (_counts[j]<2) continue;
             
-            
             neighbors=sum=0.;
             for (unsigned int jj=0; jj < _counts[j] - 1; jj++){
                 for (unsigned int k=jj+1; k < _counts[j]; k++) {
@@ -268,7 +267,8 @@ namespace trajectoryAnalysis {
             }
             
             std::ofstream os("number_info.txt");
-            for (auto& i :*_tHQs) {
+            for (unsigned int j=0; j<_tHQs->size();j++) {
+                tHQs& i = (*_tHQs)[j];
                 os << sqrt(i._rmaxsqd) << "\t" << i._numberstats.second/((double)i._numberstats.first) << std::endl;
             }
             os.close();
