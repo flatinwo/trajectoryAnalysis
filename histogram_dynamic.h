@@ -175,7 +175,7 @@ namespace stats_utils {
         int computeBinContaining(T value){
             if (value < _min) return TOO_SMALL;
             else if (value >= _max) return TOO_BIG;
-            else return (int) ( (value - _min)/(_max - _min)*_weight_of_bin.size() );
+            else return (int) ( ((double) value - _min)/(_max - _min)*_weight_of_bin.size() );
         }
         
         //creates the initial bin in the histogram

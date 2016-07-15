@@ -17,7 +17,8 @@
 
 namespace trajectoryAnalysis {
     
-    typedef std::vector< stats_utils::HistogramDynamic < double > > Hists1Dt;
+    typedef stats_utils::HistogramDynamic<double> Hist1Dt;
+    typedef std::vector< Hist1Dt > Hists1Dt;
     typedef std::vector<Hists1Dt> Hists2Dt;
     
     class Trajectory{
@@ -48,7 +49,8 @@ namespace trajectoryAnalysis {
         void setUseVanHove(bool);
         
         void computeMeanSquaredDisplacement();
-        void computeGofR();
+        Hist1Dt computeGofR(double binsize=0.01);
+        Hist1Dt computeNeighborDistribution();
         
         void printFskt();
         

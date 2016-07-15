@@ -53,8 +53,12 @@ namespace trajectoryAnalysis {
         assert(rcutoff > 0.);
         double minperiod =
         *(std::min_element(_snap->box.box_period.begin(), _snap->box.box_period.end()));
-        assert(rcutoff < 0.5*minperiod);
-        _rcutoff = rcutoff;
+        if (rcutoff > 0.5*minperiod){
+            std::cerr << "Your choice for rcutoff is larger than half of minimum period!\n";
+            std::cout << "I will fix this by choosing maximum allowable cutoff\n";
+            _rcutoff = 0.5*minperiod;
+        }
+        else _rcutoff = rcutoff;
     }
     
     void OrderParameter::setMaxNumberOfNearestNeighbors(unsigned int n_nghbrs){
@@ -72,6 +76,7 @@ namespace trajectoryAnalysis {
     
 #pragma mark COMPUTES
     
+    //calculate neighbor distribution
     void OrderParameter::_computeNearestNeighbors(){
         coord_list_t* com = &(_snap->_center_of_mass_list);
         double rcutsqd = _rcutoff*_rcutoff;
@@ -88,10 +93,26 @@ namespace trajectoryAnalysis {
                     assert(k < MAX_NUMBER_OF_NEIGHBORS);
                 }
             }
+            if (_neighborHist!=nullptr) _neighborHist->insert(k);
+            //std::cout << k << "\t";
             std::sort(_nearest_neighbors[i].begin(), _nearest_neighbors[i].begin()+k); //implement sort up to
             assert(k >= _max_number_of_neighbors);
-            assert(k > 0);  //Number of nearest numbers too many
+            //assert(k > 0);  //Number of nearest numbers too few
         }
+    }
+    
+    void OrderParameter::printNeighborDistribution(const char* filename){
+        _neighborHist = new stats_utils::HistogramDynamic<unsigned int>(1,true);
+        for (auto& i : _trajectory->_trajectory){
+            _snap = &i;
+            _computeNearestNeighbors();
+        }
+        std::cout << "Neighbor distribution for r between " << sqrt(_rminsq)
+        << " and " << _rcutoff << std::endl;
+        std::ofstream file(filename);
+        file << *_neighborHist;
+        file.close();
+        delete _neighborHist;
     }
     
     void OrderParameter::_refreshNeighbors(){
@@ -123,6 +144,7 @@ namespace trajectoryAnalysis {
         _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0.);
         _localflag = false;
         _rminsq = 0;
+        _neighborHist = nullptr;
     }
     
     void OrderParameter::setCalcType(Calc_t mode){

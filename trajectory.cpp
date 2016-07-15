@@ -113,6 +113,7 @@ namespace trajectoryAnalysis {
         
     }
     
+    //not yet done
     void Trajectory::setVanHoveBinSize(double binsize){
         if (_vanHovefxn==nullptr) {
             std::cerr << "Cannot set Van Hove Function without setting compute Fskt\n";
@@ -250,9 +251,9 @@ namespace trajectoryAnalysis {
             maxCorrelationLength = (unsigned int)_trajectory.size() - 1;
     }
     
-    void Trajectory::computeGofR(){
+   /* void Trajectory::computeGofR(){
         
-    }
+    }*/
     
     
 #pragma mark OPERATORS

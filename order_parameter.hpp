@@ -42,6 +42,7 @@ namespace trajectoryAnalysis {
         virtual void compute();
     
         void printCorrelation();
+        void printNeighborDistribution(const char* filename="NeighborDistribution.dat");
         
     protected:
         Trajectory* _trajectory;
@@ -56,12 +57,15 @@ namespace trajectoryAnalysis {
         std::vector<double_unsigned_pair1d_t> _nearest_neighbors;
         
         Snap* _snap;
+        stats_utils::HistogramDynamic<unsigned int>* _neighborHist;
         Calc_t _mode;
         coord_t _coord;
         bool _localflag;
         
         void _initialize();
         void _computeNearestNeighbors();
+        void _computeNeighborDistribution();
+        
         void _refreshNeighbors();
         //virtual void _refresh(unsigned int);
         virtual void _refresh();
