@@ -40,6 +40,9 @@ namespace trajectoryAnalysis {
         virtual void setMaxNumberOfNearestNeighbors(unsigned int);
         
         virtual void compute();
+        
+        void addSimpleIncludeRule(bool (*funcp)(unsigned, unsigned));
+        void addSimpleExcludeRule(bool (*funcp)(unsigned, unsigned));   //usually for intermolecule
     
         void printCorrelation();
         void printNeighborDistribution(const char* filename="NeighborDistribution.dat");
@@ -51,6 +54,8 @@ namespace trajectoryAnalysis {
         coord_list_t _data;
         
         unsigned_list_t _number_of_neighbors;       //count of number of neighbors
+        unsigned_list_t _neighbor_count;            //2nd counter of neighbors
+        
         unsigned int _max_number_of_neighbors;
         unsigned int _nmolecules;
         bool _useMaxNumberOfNeighbors;
@@ -61,6 +66,10 @@ namespace trajectoryAnalysis {
         Calc_t _mode;
         coord_t _coord;
         bool _localflag;
+        
+        
+        std::vector<bool (*)(unsigned, unsigned)> _exclude_funcptrs;
+        std::vector<bool (*)(unsigned, unsigned)> _include_funcptrs;
         
         void _initialize();
         void _computeNearestNeighbors();

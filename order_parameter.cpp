@@ -93,11 +93,10 @@ namespace trajectoryAnalysis {
                     assert(k < MAX_NUMBER_OF_NEIGHBORS);
                 }
             }
+            _neighbor_count[i]=k;
             if (_neighborHist!=nullptr) _neighborHist->insert(k);
-            //std::cout << k << "\t";
             std::sort(_nearest_neighbors[i].begin(), _nearest_neighbors[i].begin()+k); //implement sort up to
             assert(k >= _max_number_of_neighbors);
-            //assert(k > 0);  //Number of nearest numbers too few
         }
     }
     
@@ -118,6 +117,7 @@ namespace trajectoryAnalysis {
     void OrderParameter::_refreshNeighbors(){
         //number of nearest neighbors
         for (auto& n :_number_of_neighbors) n = 0;
+        _neighbor_count = _number_of_neighbors;
     }
     
     /*void OrderParameter::_refresh(unsigned int i){
@@ -142,6 +142,7 @@ namespace trajectoryAnalysis {
         _nearest_neighbors.resize(_snap->_center_of_mass_list.size(),
                                   double_unsigned_pair1d_t (MAX_NUMBER_OF_NEIGHBORS, std::pair<double, unsigned int>(0.,0)));
         _number_of_neighbors.resize(_snap->_center_of_mass_list.size(),0.);
+        _neighbor_count = _number_of_neighbors;
         _localflag = false;
         _rminsq = 0;
         _neighborHist = nullptr;

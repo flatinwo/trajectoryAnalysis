@@ -343,7 +343,7 @@ namespace trajectoryAnalysis {
                     is1 >> junk >>  typei >> junk >> xi >> yi >> zi;
                     info->type.push_back(typei);
                     coord_t xyz(3), rxyz(3);
-                    xyz[0] = xi; xyz[1] = yi; xyz[2] = zi;
+                    xyz[0] = xi*10; xyz[1] = yi*10; xyz[2] = zi*10;//assumes output in nm
                     x.push_back(xyz);
                     system[nsnap]._center_of_mass_list.push_back(x[0]);
                     system[nsnap]._type_list.push_back(typei);
@@ -366,6 +366,7 @@ namespace trajectoryAnalysis {
 
             std::istringstream is1(str);
             is1 >> box.box_hi[0] >> box.box_hi[1] >> box.box_hi[2];
+            for (auto &i : box.box_hi) i*=10.;//assumes output is in nm
             box.updatePeriod();
             nsnap++;
         }

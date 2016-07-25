@@ -28,6 +28,7 @@ namespace trajectoryAnalysis {
     
     TetrahedralOrderParameter::TetrahedralOrderParameter(Trajectory& traj):OrderParameter(traj){
         _max_number_of_neighbors = 4;
+        _minimum_count = _max_number_of_neighbors;
         _useMaxNumberOfNeighbors = true;
         _requireBinQvalues = true;
         _requirePositionValues = false;
@@ -64,6 +65,11 @@ namespace trajectoryAnalysis {
         else{
             if (_tHQs != nullptr) delete _tHQs;
         }
+    }
+    
+    void TetrahedralOrderParameter::setMinimumCount(unsigned int count){
+        _minimum_count = count;
+        assert(_minimum_count<=4);
     }
     
     //fix to prevent adding rmax of the same value
@@ -153,13 +159,12 @@ namespace trajectoryAnalysis {
             _counts[j] = std::count_if(_nearest_neighbors[i].begin(), _nearest_neighbors[i].begin()+4,
                                       std::bind2nd(std::less_equal<double_unsigned_pair_t>(),_condition));
             assert(_counts[j]<=4);
-            //assert(_counts[j]>=2);
             
             //update stats for each _tHQ
             (*_tHQs)[j]._numberstats.first++;
             (*_tHQs)[j]._numberstats.second+=_counts[j];
             
-            if (_counts[j]<2) continue;
+            if (_counts[j]<_minimum_count) continue;
             
             neighbors=sum=0.;
             for (unsigned int jj=0; jj < _counts[j] - 1; jj++){
@@ -246,7 +251,7 @@ namespace trajectoryAnalysis {
                 *_ofiles[0] << time << "\t" << _Qframe[i] << std::endl;
             }
             
-            if (_requireBinQvalues) *_ofiles[1] << _QHist << std::endl;
+            if (_requireBinQvalues) *_ofiles[1] << _QHist;
         }
         else{
             for (unsigned int i=0; i<(*_tHQs)[0]._Qframe.size();i++) {
@@ -263,7 +268,7 @@ namespace trajectoryAnalysis {
                 unsigned long fc = _tHQs->size();
                 for (unsigned int j=0; j<_tHQs->size(); j++) {
                     tHQs* hq = &(*_tHQs)[j];
-                    *_ofiles[fc++] << hq->_QHist << std::endl;
+                    *_ofiles[fc++] << hq->_QHist;
                 }
             }
             

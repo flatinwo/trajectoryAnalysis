@@ -7,6 +7,7 @@
 //
 
 #include "trajectory.hpp"
+#include "radial_distribution_function.hpp"
 #include "io.hpp"
 #include "spatial.hpp"
 #include <cassert>
@@ -249,6 +250,59 @@ namespace trajectoryAnalysis {
         }
         else
             maxCorrelationLength = (unsigned int)_trajectory.size() - 1;
+    }
+    
+    
+    function1d_t Trajectory::computeGofR(double binsize){
+        
+        stats_utils::HistogramDynamic < double > _hist;
+        _hist.setBinSize(binsize);
+        _hist.insert(0,0);
+        
+        for (auto& f : _trajectory) {
+            coord_list_t* com = &(f._center_of_mass_list);
+            double rcutsqd = *(std::min_element(f.box.box_period.begin(), f.box.box_period.end()));
+            rcutsqd *= (0.5-SMALL);
+            rcutsqd *= rcutsqd;
+            
+            for (unsigned int i=0; i<com->size(); i++) {
+                for (unsigned int j=i+1; j<com->size(); j++) {
+                    double rsq = distancesq((*com)[i], (*com)[j], f.box);
+                    if (rsq < rcutsqd ) _hist.insert(sqrt(rsq),2.0);
+                }
+            }
+
+        }
+        
+        function1d_t _gofr, normalization, probability;
+        double _vol = 1.;
+        for (auto& i : _trajectory[0].box.box_period) _vol *= i;
+        
+        double npart = _trajectory[0]._center_of_mass_list.size();
+        double density = npart/_vol;
+        double delta = 0.5*_hist.getBinSize();
+        
+        for (unsigned int i=0; i<_hist.getNumberOfBins(); i++) {
+            std::pair<double,double> bin = _hist.getBin(i);
+            double r = bin.first;
+            double count = bin.second;
+            
+            double vol_shell = 4.0/3.0*M_PI*(pow(r+delta,3) - pow(r-delta,3));
+            double np_ideal_gas = density*vol_shell;
+            
+            if (normalization.find(r) == normalization.end()) {
+                normalization[r] = 0.0;
+                probability[r] = 0.0;
+            }
+            
+            normalization[r] += np_ideal_gas*npart;
+            probability[r] += count;
+        }
+        
+        for (function1d_t::iterator i=normalization.begin(); i!=normalization.end(); ++i)
+            _gofr[i->first] = probability[i->first]/(i->second*_trajectory.size()); //needs work
+        
+        return _gofr;
     }
     
    /* void Trajectory::computeGofR(){

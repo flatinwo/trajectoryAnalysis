@@ -42,6 +42,7 @@ namespace trajectoryAnalysis {
         
         void setMaxNumberOfNearestNeighbors(unsigned int);
         void setPositionTetrahedrality(bool);
+        void setMinimumCount(unsigned int);
         void addRmax(double);
         
         double getQ();
@@ -52,6 +53,7 @@ namespace trajectoryAnalysis {
     protected:
         double _Q;
         double_unsigned_pair_t _condition;
+        unsigned int _minimum_count;
         
         std::vector<tHQs>* _tHQs;
         std::vector<short> _counts; 

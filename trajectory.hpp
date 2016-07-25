@@ -27,6 +27,7 @@ namespace trajectoryAnalysis {
         friend class BondOrderParameter;
         friend class TetrahedralOrderParameter;
         friend class AveragedBondOrderParameter;
+        friend class LocalStructureIndex;
         
     public:
         Trajectory();
@@ -49,7 +50,7 @@ namespace trajectoryAnalysis {
         void setUseVanHove(bool);
         
         void computeMeanSquaredDisplacement();
-        Hist1Dt computeGofR(double binsize=0.01);
+        function1d_t computeGofR(double binsize=0.01);
         Hist1Dt computeNeighborDistribution();
         
         void printFskt();
