@@ -60,6 +60,8 @@ namespace trajectoryAnalysis {
     
     //destructor
     Trajectory::~Trajectory(){
+        std::cout << "Number of frames processed is " << getNumberOfSnaps() << std::endl;
+        std::cout << "Trajectory is destructing...\n";
         if (_Fskts!=nullptr) delete _Fskts;
         if (_ks !=nullptr) delete _ks;
         if (_vanHovefxn != nullptr) delete _vanHovefxn;
@@ -70,6 +72,11 @@ namespace trajectoryAnalysis {
     //return number of snaps
     int Trajectory::getNumberOfSnaps(){
         return (int) _trajectory.size();
+    }
+    
+    //return number of frames, same as number of snaps
+    int Trajectory::getNumberOfFrames(){
+        return getNumberOfSnaps();
     }
     
     //return time step
@@ -264,6 +271,7 @@ namespace trajectoryAnalysis {
             double rcutsqd = *(std::min_element(f.box.box_period.begin(), f.box.box_period.end()));
             rcutsqd *= (0.5-SMALL);
             rcutsqd *= rcutsqd;
+            
             
             for (unsigned int i=0; i<com->size(); i++) {
                 for (unsigned int j=i+1; j<com->size(); j++) {

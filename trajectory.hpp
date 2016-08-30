@@ -40,6 +40,7 @@ namespace trajectoryAnalysis {
         unsigned int maxCorrelationLength;
         
         int getNumberOfSnaps();
+        int getNumberOfFrames();
         double getTimeStep();
         trajectory_t& getTrajectory();
         void unfold();

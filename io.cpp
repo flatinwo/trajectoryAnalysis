@@ -219,75 +219,90 @@ namespace trajectoryAnalysis {
         int nsnap = 0;
         std::string str, word;
         
-        while (std::getline(*is, str)) {
-            
-            system.push_back(Snap());
-            
-            //box reference
-            Box& box = system[nsnap].box;
-            
-            //get total number of particles
-            int n = 0;
-            std::istringstream iss(str.c_str());
-            iss >> n;
-            
-            //std::cout << str << "\t" << n << std::endl;
-            assert(n>0);
-            
-            //now attempt to get box size
-            //a quick long winded approach and assumes that box_lo = zeroes
-            std::getline(*is,str);
-            std::stack<std::string> text;
-            std::istringstream iss1(str);
-            while (iss1.good()) {
-                iss1 >> word;
-                text.push(word);
-            }
-            
-            //it is iterator
-            for (auto it=box.box_hi.rbegin(); it != box.box_hi.rend(); ++it) {
-                *it = std::stod(text.top());
-                text.pop();
-            }
-            //update to compute period
-            box.updatePeriod();
-            text.pop(); text.pop();
-            system[nsnap].timestep = std::stoi(text.top());
-            
-            coord_list_t x;
-            info->type.clear();
-            
-            for (int i=0; i<n; i++) {
-                std::string typei;
-                double xi, yi, zi;
+        //set exceptions
+        is->exceptions(std::ifstream::failbit|std::ifstream::badbit);
+        
+        
+        try{
+            while (std::getline(*is, str)) {
+                
+                system.push_back(Snap());
+                
+                //box reference
+                Box& box = system[nsnap].box;
+                
+                //get total number of particles
+                int n = 0;
+                std::istringstream iss(str.c_str());
+                iss >> n;
+                
+                //std::cout << str << "\t" << n << std::endl;
+                assert(n>0);
+                
+                //now attempt to get box size
+                //a quick long winded approach and assumes that box_lo = zeroes
                 std::getline(*is,str);
-                if ((i%every) == index-1 ){
-                    std::istringstream is1(str);
-                    is1 >> typei >> xi >> yi >> zi;
-                    info->type.push_back(typei);
-                    coord_t xyz(3), rxyz(3);
-                    xyz[0] = xi; xyz[1] = yi; xyz[2] = zi;
-                    x.push_back(xyz);
-                    system[nsnap]._center_of_mass_list.push_back(x[0]);
-                    system[nsnap]._type_list.push_back(typei);
-                    x.clear();
+                std::stack<std::string> text;
+                std::istringstream iss1(str);
+                while (iss1.good()) {
+                    iss1 >> word;
+                    text.push(word);
                 }
-                if (str.empty()){
-                    system.pop_back();
-                    delete info;
-                    return;
+                
+                //it is iterator
+                for (auto it=box.box_hi.rbegin(); it != box.box_hi.rend(); ++it) {
+                    *it = std::stod(text.top());
+                    text.pop();
                 }
+                //update to compute period
+                box.updatePeriod();
+                text.pop(); text.pop();
+                system[nsnap].timestep = std::stoi(text.top());
+                
+                coord_list_t x;
+                info->type.clear();
+                
+                for (int i=0; i<n; i++) {
+                    std::string typei;
+                    double xi, yi, zi;
+                    std::getline(*is,str);
+                    if ((i%every) == index-1 ){
+                        std::istringstream is1(str);
+                        is1 >> typei >> xi >> yi >> zi;
+                        info->type.push_back(typei);
+                        coord_t xyz(3), rxyz(3);
+                        xyz[0] = xi; xyz[1] = yi; xyz[2] = zi;
+                        x.push_back(xyz);
+                        system[nsnap]._center_of_mass_list.push_back(x[0]);
+                        system[nsnap]._type_list.push_back(typei);
+                        x.clear();
+                    }
+                    if (str.empty()){
+                        system.pop_back();
+                        delete info;
+                        return;
+                    }
+                }
+                //std::getline(*is,str);
+                nsnap++;
             }
-            //std::getline(*is,str);
-            nsnap++;
-        }
-        
-        if (info->instream == 0x0) {
-            ifs.close();
-        }
-        
-        delete info;
+            
+            if (info->instream == 0x0) {
+                ifs.close();
+            }
+            
+            delete info;
 
+        }
+        catch(std::ifstream::failure e){
+            std::cerr << "Exception happened: " << e.what() << "\n"
+            << "Error bits are: "
+            << "\nfailbit: " << is->fail()
+            << "\neofbit: " << is->eof()
+            << "\nbadbit: " << is->bad()
+            << "\nlikely provided incomplete file" << std::endl;
+            system.pop_back();
+        }
     }
     
     
