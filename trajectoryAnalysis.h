@@ -27,5 +27,6 @@
 #include "averaged_bond_order_parameter.hpp"
 #include "averaged_tetrahedral_order_parameter.hpp"
 #include "local_structure_index.hpp"
+#include "io_user_xdr.hpp"
 
 #endif /* trajectoryAnalysis_h */

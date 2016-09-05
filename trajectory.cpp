@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <fstream>
 #include <sstream>
+#include "io_user_xdr.hpp"
 
 namespace trajectoryAnalysis {
     
@@ -50,6 +51,14 @@ namespace trajectoryAnalysis {
         
         
         if (type==GRO) loadgrofancy(filename,_trajectory,index,every);
+#ifdef IO_XDR
+        else if (type==XTC){
+            xdr_info settings;
+            settings.com_id = index;
+            settings.every = every;
+            loadxtc(filename,_trajectory,settings);
+        }
+#endif
         else { std::cerr << "Unknown filetype\n"; exit(-1);}
         
         //compute time step and maximum correlation length
