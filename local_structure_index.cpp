@@ -7,6 +7,9 @@
 //
 
 #include "local_structure_index.hpp"
+#include <limits>
+#include <algorithm>
+
 #define MAXNEIGHBORS 25
 
 //use threads
