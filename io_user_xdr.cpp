@@ -44,7 +44,7 @@ namespace trajectoryAnalysis{
   
             
             if ((settings.count%settings.nskipframe) == 0) {
-                settings.nframes_used++;
+                //settings.nframes_used++;
                 system.push_back(Snap());
                 system[nsnap].timestep = step;
                 

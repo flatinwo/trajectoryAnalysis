@@ -23,7 +23,7 @@ namespace trajectoryAnalysis {
     
     //constructor 1
     Trajectory::Trajectory():maxCorrelationLength(0),_time_step(100), _unfolded(false){
-        _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;
+        _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_maxframes=50000;
     }
     
     //constructor 2
@@ -31,6 +31,7 @@ namespace trajectoryAnalysis {
     Trajectory::Trajectory(const char* filename, bool fancy, unsigned int index, unsigned int every){
 
         _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
+        _maxframes=50000;
         
         _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;
 
@@ -44,8 +45,9 @@ namespace trajectoryAnalysis {
 
     }
     
-    Trajectory::Trajectory(const char* filename, FILETYPE type, unsigned int index, unsigned int every){
+    Trajectory::Trajectory(const char* filename, FILETYPE type, unsigned int index, unsigned int every, unsigned int maxframes){
         _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
+        _maxframes = maxframes;
         
         _Fskts=nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;
         
@@ -56,6 +58,7 @@ namespace trajectoryAnalysis {
             xdr_info settings;
             settings.com_id = index;
             settings.every = every;
+            settings.max_frame = _maxframes;
             loadxtc(filename,_trajectory,settings);
         }
 #endif
@@ -99,6 +102,19 @@ namespace trajectoryAnalysis {
     }
     
 #pragma mark SETS
+    void Trajectory::setMaxNumberOfFrames(int n){
+        assert(n < INT_MAX);
+        assert(_trajectory.size() > n);
+        _maxframes = n;
+        _trajectory.resize(_maxframes);
+        
+    }
+    
+    void Trajectory::setTimeStep(double dt){
+        _time_step = dt;
+    }
+    
+    
     void Trajectory::setUseVanHove(bool flag){
         _useVanHove = flag;
     }
@@ -359,11 +375,14 @@ namespace trajectoryAnalysis {
             exit(-1);
         }
         
+        double dstep = _trajectory[1].timestep - _trajectory[0].timestep;
+        
+        
         for (unsigned int i=0; i<_Fskts->size(); i++) {
             std::string str="Fskt"+ std::to_string((*_ks)[i])+".dat";
             std::ofstream myfile(str.c_str());
             for (unsigned int j=1; j< (*_Fskts)[i].size(); j++) {
-                myfile << _time_step*j << "\t" << (*_Fskts)[i][j]/((*_Fskts)[i][1]) << std::endl;
+                myfile << dstep*_time_step << "\t" << (*_Fskts)[i][j]/((*_Fskts)[i][1]) << std::endl;
             }
             myfile.close();
         }

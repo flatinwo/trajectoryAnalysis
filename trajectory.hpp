@@ -32,7 +32,7 @@ namespace trajectoryAnalysis {
     public:
         Trajectory();
         Trajectory(const char* filename, bool=false, unsigned int i=1, unsigned int=5);
-        Trajectory(const char* filename, FILETYPE=GRO, unsigned int i=1, unsigned int=4);
+        Trajectory(const char* filename, FILETYPE=GRO, unsigned int i=1, unsigned int=4, unsigned int=50000);
         ~Trajectory();
         
         friend Trajectory operator+(const Trajectory& rhs1, const Trajectory& rhs2);
@@ -45,10 +45,12 @@ namespace trajectoryAnalysis {
         trajectory_t& getTrajectory();
         void unfold();
         
+        void setTimeStep(double);
         void setComputeFskt(bool=true,double=4.0);
         void setComputeFrequency(double);
         void setVanHoveBinSize(double=0.01);
         void setUseVanHove(bool);
+        void setMaxNumberOfFrames(int n);
         
         void computeMeanSquaredDisplacement();
         function1d_t computeGofR(double binsize=0.01);
@@ -61,6 +63,7 @@ namespace trajectoryAnalysis {
     protected:
         trajectory_t _trajectory;
         double _time_step,_k;
+        unsigned int _maxframes;
         bool _useVanHove;
         bool _unfolded;
         bool _computeFskt;
