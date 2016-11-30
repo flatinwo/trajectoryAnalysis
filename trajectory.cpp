@@ -107,6 +107,7 @@ namespace trajectoryAnalysis {
         assert(_trajectory.size() > n);
         _maxframes = n;
         _trajectory.resize(_maxframes);
+        computeMaxCorrelationLength();
         
     }
     
@@ -369,20 +370,20 @@ namespace trajectoryAnalysis {
         return trajr;
     }
     
-    void Trajectory::printFskt(){
+    void Trajectory::printFskt(double dstep=1.){
         if (_Fskts==nullptr){
             std::cerr << "Fskt has not been computed\n";
             exit(-1);
         }
         
-        double dstep = _trajectory[1].timestep - _trajectory[0].timestep;
-        
+        if (dstep == 1.) dstep = _trajectory[1].timestep - _trajectory[0].timestep;
+        if (dstep <= 0.) dstep=1.;
         
         for (unsigned int i=0; i<_Fskts->size(); i++) {
             std::string str="Fskt"+ std::to_string((*_ks)[i])+".dat";
             std::ofstream myfile(str.c_str());
-            for (unsigned int j=1; j< (*_Fskts)[i].size(); j++) {
-                myfile << dstep*_time_step << "\t" << (*_Fskts)[i][j]/((*_Fskts)[i][1]) << std::endl;
+            for (unsigned int j=1; j< (*_Fskts)[i].size() || j < maxCorrelationLength; j++) {
+                myfile << dstep*_time_step*(j-1) << "\t" << (*_Fskts)[i][j]/((*_Fskts)[i][1]) << std::endl;
             }
             myfile.close();
         }
