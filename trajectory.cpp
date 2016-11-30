@@ -370,7 +370,7 @@ namespace trajectoryAnalysis {
         return trajr;
     }
     
-    void Trajectory::printFskt(double dstep=1.){
+    void Trajectory::printFskt(double dstep){
         if (_Fskts==nullptr){
             std::cerr << "Fskt has not been computed\n";
             exit(-1);
