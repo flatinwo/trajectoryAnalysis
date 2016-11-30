@@ -56,7 +56,7 @@ namespace trajectoryAnalysis {
         function1d_t computeGofR(double binsize=0.01);
         Hist1Dt computeNeighborDistribution();
         
-        void printFskt(double);
+        void printFskt(double=1.);
         
         friend std::ostream& operator << (std::ostream&, const Trajectory&);
         
