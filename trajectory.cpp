@@ -382,7 +382,7 @@ namespace trajectoryAnalysis {
         for (unsigned int i=0; i<_Fskts->size(); i++) {
             std::string str="Fskt"+ std::to_string((*_ks)[i])+".dat";
             std::ofstream myfile(str.c_str());
-            for (unsigned int j=1; j< (*_Fskts)[i].size() || j < maxCorrelationLength; j++) {
+            for (unsigned int j=1; j< (*_Fskts)[i].size() && j < maxCorrelationLength; j++) {
                 myfile << dstep*_time_step*(j-1) << "\t" << (*_Fskts)[i][j]/((*_Fskts)[i][1]) << std::endl;
             }
             myfile.close();
