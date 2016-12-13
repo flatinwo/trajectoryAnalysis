@@ -104,7 +104,7 @@ namespace trajectoryAnalysis {
 #pragma mark SETS
     void Trajectory::setMaxNumberOfFrames(int n){
         assert(n < INT_MAX);
-        assert(_trajectory.size() > n);
+        if (_trajectory.size() < n) n = (int)_trajectory.size();
         _maxframes = n;
         _trajectory.resize(_maxframes);
         computeMaxCorrelationLength();
