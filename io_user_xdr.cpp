@@ -22,7 +22,9 @@ namespace trajectoryAnalysis{
         
         //sets up filename to be used by read_xtc
         std::string str(filename);
-        char cfilename[200];
+        const int SDIM=200;
+        char cfilename[SDIM]="";
+        assert(str.size()<SDIM);
         for (unsigned int i=0;i<str.size();i++) cfilename[i] = str[i];
         
         //get number of atoms and assume number of atoms is fixed
