@@ -147,6 +147,10 @@ namespace trajectoryAnalysis {
         
     }
     
+    void Trajectory::setUnFolded(bool flag){
+        _unfolded = flag;
+    }
+    
     //not yet done
     void Trajectory::setVanHoveBinSize(double binsize){
         if (_vanHovefxn==nullptr) {
@@ -220,6 +224,8 @@ namespace trajectoryAnalysis {
 
         coord_t dr(3,0.);
         double deltar=0.;
+        //efficient to skip a few frames...
+        //implement at a latter time... log type spacing or add flag for this
         for (unsigned int i=0; i < _trajectory.size(); i++) {
             for (unsigned int j=1; j < maxCorrelationLength; j++) {
                 if (i+j >= _trajectory.size())
