@@ -51,6 +51,7 @@ namespace trajectoryAnalysis {
         void setVanHoveBinSize(double=0.01);
         void setUseVanHove(bool);
         void setMaxNumberOfFrames(int n);
+        void setUnFolded(bool);
         
         void computeMeanSquaredDisplacement();
         function1d_t computeGofR(double binsize=0.01);
