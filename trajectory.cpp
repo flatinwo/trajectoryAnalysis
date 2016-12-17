@@ -227,7 +227,7 @@ namespace trajectoryAnalysis {
         //efficient to skip a few frames...
         //implement at a latter time... log type spacing or add flag for this
         for (unsigned int i=0; i < _trajectory.size(); i++) {
-            for (unsigned int j=1; j < maxCorrelationLength; j++) {
+            for (unsigned int j=0; j < maxCorrelationLength; j++) {
                 if (i+j >= _trajectory.size())
                     continue;
                 else{
@@ -264,7 +264,7 @@ namespace trajectoryAnalysis {
         //normalize Fskt
         if (_computeFskt) {
             for (unsigned int f=0; f<_Fskts->size();f++) {
-                for (unsigned int j=1; j<(*_Fskts)[f].size(); j++) {
+                for (unsigned int j=0; j<(*_Fskts)[f].size(); j++) {
                      (*_Fskts)[f][j] *= (normalization/correlation[j].first);
                 }
             }
@@ -388,8 +388,8 @@ namespace trajectoryAnalysis {
         for (unsigned int i=0; i<_Fskts->size(); i++) {
             std::string str="Fskt"+ std::to_string((*_ks)[i])+".dat";
             std::ofstream myfile(str.c_str());
-            for (unsigned int j=1; j< (*_Fskts)[i].size() && j < maxCorrelationLength; j++) {
-                myfile << dstep*_time_step*(j-1) << "\t" << (*_Fskts)[i][j]/((*_Fskts)[i][1]) << std::endl;
+            for (unsigned int j=0; j< (*_Fskts)[i].size() && j < maxCorrelationLength; j++) {
+                myfile << dstep*_time_step*(j) << "\t" << (*_Fskts)[i][j] << std::endl;
             }
             myfile.close();
         }
