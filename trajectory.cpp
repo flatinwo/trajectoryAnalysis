@@ -19,7 +19,7 @@
 namespace trajectoryAnalysis {
     
 #define TRAJMIN 1
-#define SMALL 0.0001
+#define SMALL 0.0000001
     
     //constructor 1
     Trajectory::Trajectory():maxCorrelationLength(0),_time_step(100), _unfolded(false){
@@ -242,8 +242,8 @@ namespace trajectoryAnalysis {
                             assert(_Fskts->size()==_ks->size());
                             for (unsigned int f=0; f<_Fskts->size();f++) {
                                 double kdeltar = (*_ks)[f]*sqrt(deltar);
-                                if (kdeltar < SMALL) kdeltar=SMALL;
-                                (*_Fskts)[f][j] += sin(kdeltar)/kdeltar;
+                                if (kdeltar < SMALL) (*_Fskts)[f][j] += 1.0;
+                                else (*_Fskts)[f][j] += sin(kdeltar)/kdeltar;
                             }
                         }
 
