@@ -24,6 +24,7 @@ namespace trajectoryAnalysis {
     //constructor 1
     Trajectory::Trajectory():maxCorrelationLength(0),_time_step(100), _unfolded(false){
         _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_maxframes=50000;
+        _skipinfo=nullptr;_skipfactor=2;
     }
     
     //constructor 2
@@ -33,7 +34,8 @@ namespace trajectoryAnalysis {
         _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
         _maxframes=50000;
         
-        _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;
+        _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=nullptr;
+        _skipfactor=2;
 
         //load trajectory
         if (fancy) loadxyzfancy(filename, _trajectory, index, every);
@@ -47,9 +49,9 @@ namespace trajectoryAnalysis {
     
     Trajectory::Trajectory(const char* filename, FILETYPE type, unsigned int index, unsigned int every, unsigned int maxframes){
         _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
-        _maxframes = maxframes;
+        _maxframes = maxframes;_skipfactor=2;
         
-        _Fskts=nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;
+        _Fskts=nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=nullptr;
         
         
         if (type==GRO) loadgrofancy(filename,_trajectory,index,every);
@@ -77,6 +79,7 @@ namespace trajectoryAnalysis {
         if (_Fskts!=nullptr) delete _Fskts;
         if (_ks !=nullptr) delete _ks;
         if (_vanHovefxn != nullptr) delete _vanHovefxn;
+        if (_skipinfo != nullptr) delete _skipinfo;
     }
     
 #pragma mark GETS
@@ -118,6 +121,16 @@ namespace trajectoryAnalysis {
     
     void Trajectory::setUseVanHove(bool flag){
         _useVanHove = flag;
+    }
+    
+    void Trajectory::setSkipInfo(Skipt _skip,short sf){
+        if (_skipinfo == nullptr) _skipinfo = new Skipt();
+        _skipinfo->first = _skip.first;
+        _skipinfo->second = _skip.second;
+        _skipfactor = sf;
+        
+        assert(_skipfactor >= 1);
+        assert(_skipinfo->second >= 1);
     }
     
     void Trajectory::setComputeFskt(bool shouldi, double k){
@@ -228,8 +241,8 @@ namespace trajectoryAnalysis {
         //implement at a latter time... log type spacing or add flag for this
         for (unsigned int i=0; i < _trajectory.size(); i++) {
             for (unsigned int j=0; j < maxCorrelationLength; j++) {
-                if (i+j >= _trajectory.size())
-                    continue;
+                if (i+j >= _trajectory.size()) continue;
+                else if (_skipinfo->first && j > _skipinfo->second && (_skipfactor*j)%_skipinfo->second != 0) continue; //maybe make skipinfo or struct in case i want a different skip_info
                 else{
                     for (unsigned int l=0; l < _trajectory[i]._center_of_mass_list.size(); l++){
                         deltar=0.;
@@ -389,6 +402,7 @@ namespace trajectoryAnalysis {
             std::string str="Fskt"+ std::to_string((*_ks)[i])+".dat";
             std::ofstream myfile(str.c_str());
             for (unsigned int j=0; j< (*_Fskts)[i].size() && j < maxCorrelationLength; j++) {
+                if (_skipinfo->first && j > _skipinfo->second && (_skipfactor*j)%_skipinfo->second != 0) continue;
                 myfile << dstep*_time_step*(j) << "\t" << (*_Fskts)[i][j] << std::endl;
             }
             myfile.close();

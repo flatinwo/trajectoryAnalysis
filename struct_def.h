@@ -18,7 +18,7 @@
 namespace trajectoryAnalysis {
     
     typedef std::vector<double> coord_t;
-    typedef std::vector<bool> bool_list_t;
+    typedef std::vector<bool> bool_list_t; //people say this is bad
     typedef std::vector<coord_t> coord_list_t;
     typedef std::vector<unsigned int>  unsigned_list_t;
     
