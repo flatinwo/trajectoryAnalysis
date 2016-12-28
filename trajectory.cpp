@@ -24,7 +24,7 @@ namespace trajectoryAnalysis {
     //constructor 1
     Trajectory::Trajectory():maxCorrelationLength(0),_time_step(100), _unfolded(false){
         _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_maxframes=50000;
-        _skipinfo=nullptr;_skipfactor=2;
+        _skipinfo=_skipinfo=new Skipt(false,1);_skipfactor=2;
     }
     
     //constructor 2
@@ -34,7 +34,7 @@ namespace trajectoryAnalysis {
         _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
         _maxframes=50000;
         
-        _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=nullptr;
+        _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=_skipinfo=new Skipt(false,1);
         _skipfactor=2;
 
         //load trajectory
@@ -51,7 +51,7 @@ namespace trajectoryAnalysis {
         _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
         _maxframes = maxframes;_skipfactor=2;
         
-        _Fskts=nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=nullptr;
+        _Fskts=nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=new Skipt(false,1);
         
         
         if (type==GRO) loadgrofancy(filename,_trajectory,index,every);
