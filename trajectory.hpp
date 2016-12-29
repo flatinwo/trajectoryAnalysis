@@ -39,7 +39,6 @@ namespace trajectoryAnalysis {
         
         friend Trajectory operator+(const Trajectory& rhs1, const Trajectory& rhs2);
         
-        unsigned int maxCorrelationLength;
         
         int getNumberOfSnaps();
         int getNumberOfFrames();
@@ -55,6 +54,7 @@ namespace trajectoryAnalysis {
         void setMaxNumberOfFrames(int n);
         void setUnFolded(bool);
         void setSkipInfo(Skipt = std::make_pair(true,100),short=2);
+        void setMaxCorrelationLength(unsigned int mcl);
         
         void computeMeanSquaredDisplacement();
         function1d_t computeGofR(double binsize=0.01);
@@ -72,6 +72,7 @@ namespace trajectoryAnalysis {
         bool _unfolded;
         bool _computeFskt;
         short _skipfactor;
+        unsigned int maxCorrelationLength;
         
         
         void computeTimeStep();

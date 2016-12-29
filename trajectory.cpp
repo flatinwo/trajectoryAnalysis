@@ -22,7 +22,7 @@ namespace trajectoryAnalysis {
 #define SMALL 0.0000001
     
     //constructor 1
-    Trajectory::Trajectory():maxCorrelationLength(0),_time_step(100), _unfolded(false){
+    Trajectory::Trajectory():maxCorrelationLength(1),_time_step(100), _unfolded(false){
         _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_maxframes=50000;
         _skipinfo=_skipinfo=new Skipt(false,1);_skipfactor=2;
     }
@@ -111,6 +111,13 @@ namespace trajectoryAnalysis {
         _maxframes = n;
         _trajectory.resize(_maxframes);
         computeMaxCorrelationLength();
+        
+    }
+    
+    void Trajectory::setMaxCorrelationLength(unsigned int mcl){
+        maxCorrelationLength = mcl;
+        assert(maxCorrelationLength > 10);
+        assert(3*maxCorrelationLength <= _trajectory.size());
         
     }
     
