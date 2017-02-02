@@ -83,6 +83,8 @@ namespace trajectoryAnalysis {
         coord_list_t* _Fskts;
         coord_t* _ks;
         
+        FILETYPE _type;
+        
         Hists2Dt* _vanHovefxn;      //self-part of Van Hove function
         Skipt* _skipinfo;
     };

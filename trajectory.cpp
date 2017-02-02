@@ -44,6 +44,7 @@ namespace trajectoryAnalysis {
         //compute time step and maximum correlation length
         computeTimeStep();
         computeMaxCorrelationLength();
+        _type = XYZ;
 
     }
     
@@ -54,7 +55,10 @@ namespace trajectoryAnalysis {
         _Fskts=nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=new Skipt(false,1);
         
         
-        if (type==GRO) loadgrofancy(filename,_trajectory,index,every);
+        if (type==GRO) {
+            loadgrofancy(filename,_trajectory,index,every);
+            _type = GRO;
+        }
 #ifdef IO_XDR
         else if (type==XTC){
             xdr_info settings;
@@ -62,6 +66,7 @@ namespace trajectoryAnalysis {
             settings.every = every;
             settings.max_frame = _maxframes;
             loadxtc(filename,_trajectory,settings);
+            _type = XTC;
         }
 #endif
         else { std::cerr << "Unknown filetype\n"; exit(-1);}
@@ -249,7 +254,7 @@ namespace trajectoryAnalysis {
         for (unsigned int i=0; i < _trajectory.size(); i++) {
             for (unsigned int j=0; j < maxCorrelationLength; j++) {
                 if (i+j >= _trajectory.size()) continue;
-                else if (_skipinfo->first && j > _skipinfo->second && (_skipfactor*j)%_skipinfo->second != 0) continue; //maybe make skipinfo or struct in case i want a different skip_info
+                else if (_skipinfo->first && j > _skipinfo->second && j%_skipfactor != 0) continue; //maybe make skipinfo or struct in case i want a different skip_info
                 else{
                     for (unsigned int l=0; l < _trajectory[i]._center_of_mass_list.size(); l++){
                         deltar=0.;
@@ -402,14 +407,14 @@ namespace trajectoryAnalysis {
             exit(-1);
         }
         
-        if (dstep == 1.) dstep = _trajectory[1].timestep - _trajectory[0].timestep;
+        if (dstep == 1.|| _type == XTC) dstep = _trajectory[1].timestep - _trajectory[0].timestep;
         if (dstep <= 0.) dstep=1.;
         
         for (unsigned int i=0; i<_Fskts->size(); i++) {
             std::string str="Fskt"+ std::to_string((*_ks)[i])+".dat";
             std::ofstream myfile(str.c_str());
             for (unsigned int j=0; j< (*_Fskts)[i].size() && j < maxCorrelationLength; j++) {
-                if (_skipinfo->first && j > _skipinfo->second && (_skipfactor*j)%_skipinfo->second != 0) continue;
+                if (_skipinfo->first && j > _skipinfo->second && j%_skipfactor != 0) continue;
                 myfile << dstep*_time_step*(j) << "\t" << (*_Fskts)[i][j] << std::endl;
             }
             myfile.close();
