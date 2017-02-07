@@ -120,10 +120,11 @@ namespace trajectoryAnalysis {
     }
     
     void Trajectory::setMaxCorrelationLength(unsigned int mcl){
-        maxCorrelationLength = mcl;
-        assert(maxCorrelationLength > 10);
-        assert(3*maxCorrelationLength <= _trajectory.size());
-        
+        assert(mcl > 10);
+        if (3*mcl < _trajectory.size()) maxCorrelationLength = mcl;
+        else std::cerr << "Specified max correlation length is out of range.\n"
+                        << "I will use the max possible value of " << maxCorrelationLength << " .\n"
+                        << "To override choose length <  " << _trajectory.size()/3 << ".\n";
     }
     
     void Trajectory::setTimeStep(double dt){
