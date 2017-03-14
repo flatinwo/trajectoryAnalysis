@@ -31,6 +31,10 @@ namespace trajectoryAnalysis {
         
         double getQl();
         double getWl();
+        double getqli(int i=0){ return _qli[i];};
+        double getwli(int i=0){ return _wli[i];};
+        
+        
         void print();
         
         void addLvalue(int);

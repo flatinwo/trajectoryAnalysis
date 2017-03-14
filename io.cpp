@@ -220,7 +220,8 @@ namespace trajectoryAnalysis {
         std::string str, word;
         
         //set exceptions
-        is->exceptions(std::ifstream::failbit|std::ifstream::badbit);
+        //is->exceptions(std::ifstream::failbit|std::ifstream::badbit);
+        is->exceptions(std::ifstream::badbit);
         
         
         try{
