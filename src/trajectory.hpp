@@ -35,6 +35,7 @@ namespace trajectoryAnalysis {
         Trajectory();
         Trajectory(const char* filename, bool=false, unsigned int i=1, unsigned int=5);
         Trajectory(const char* filename, FILETYPE=GRO, unsigned int i=1, unsigned int=4, unsigned int=50000);
+        Trajectory(trajectory_t&);
         ~Trajectory();
         
         friend Trajectory operator+(const Trajectory& rhs1, const Trajectory& rhs2);

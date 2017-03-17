@@ -17,16 +17,21 @@
 namespace trajectoryAnalysis{
     class BondOrderChiralityAnalysis : public ChiralityAnalysis{
     public:
-        BondOrderChiralityAnalysis(int argc, const char* argv[], short);
-        BondOrderChiralityAnalysis(const char* filename, Box& box, short);
+        BondOrderChiralityAnalysis(int argc, const char* argv[], short, bool=true);
+        BondOrderChiralityAnalysis(const char* filename, Box& box, short, bool=true);
         ~BondOrderChiralityAnalysis();
         
         void refresh();
         void computeBOP();
         
     protected:
+        
+        bool useCOM;
+        short _idx;
         std::array<double, 3> ref_point={0.,0.,0};
+        
         BondOrderParameter* _bop;
+        Trajectory* _trajobj;
         
     };
 }

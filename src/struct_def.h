@@ -43,7 +43,7 @@ namespace trajectoryAnalysis {
     
     typedef std::map<std::string, unsigned int> typelog_t;
     
-    enum FILETYPE {XYZ=0,GRO=1,XTC=2};
+    enum FILETYPE {XYZ=0,GRO=1,XTC=2,UNSPECIFIED=3};
     
     
     //overloaded operators

@@ -48,6 +48,24 @@ namespace trajectoryAnalysis {
 
     }
     
+    Trajectory::Trajectory(trajectory_t& traj){
+        _type = UNSPECIFIED;
+        _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
+        _maxframes = 50000;_skipfactor=2;
+        
+        
+        _Fskts=nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=new Skipt(false,1);
+        //compute time step and maximum correlation length
+        
+        _trajectory = traj;
+        
+        
+        computeTimeStep();
+        computeMaxCorrelationLength();
+        
+        
+    }
+    
     Trajectory::Trajectory(const char* filename, FILETYPE type, unsigned int index, unsigned int every, unsigned int maxframes){
         _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
         _maxframes = maxframes;_skipfactor=2;
