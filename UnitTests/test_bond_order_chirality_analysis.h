@@ -24,14 +24,44 @@ struct TestBondOrderChiralityAnalysis : public testing::Test{
     }
 };
 
+/*TEST_F(TestBondOrderChiralityAnalysis,SetUp){
+    const char* fn = "/Users/Folarin/Documents/cplusplustutor/ladapo_test/Latinwo_tests/trajectoryAnalysis/trajectoryAnalysis/UnitTests/data/racemic_lattice.xyz";
+    
+    tbox.box_hi = coord_t(3,100.);
+    tbox.updatePeriod();
+    
+    boca.reset(new BondOrderChiralityAnalysis(fn,tbox,4,true));
+    compute();
+    
+    boca.reset(new BondOrderChiralityAnalysis(fn,tbox,6,true));
+    compute();
+    
+    
+    boca.reset(new BondOrderChiralityAnalysis(fn,tbox,8,true));
+    compute();
+    
+    boca.reset(new BondOrderChiralityAnalysis(fn,tbox,10,true));
+    compute();
+}*/
+
 TEST_F(TestBondOrderChiralityAnalysis,SetUp){
     const char* fn = "/Users/Folarin/Documents/cplusplustutor/ladapo_test/Latinwo_tests/trajectoryAnalysis/trajectoryAnalysis/UnitTests/data/mylattice.xyz";
     
     tbox.box_hi = coord_t(3,100.);
     tbox.updatePeriod();
+    
     boca.reset(new BondOrderChiralityAnalysis(fn,tbox,4,true));
     compute();
     
+    boca.reset(new BondOrderChiralityAnalysis(fn,tbox,6,true));
+    compute();
+    
+    
+    boca.reset(new BondOrderChiralityAnalysis(fn,tbox,8,true));
+    compute();
+    
+    boca.reset(new BondOrderChiralityAnalysis(fn,tbox,10,true));
+    compute();
 }
 
 #endif /* test_bond_order_chirality_analysis_h */

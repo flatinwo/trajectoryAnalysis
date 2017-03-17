@@ -26,10 +26,11 @@ namespace trajectoryAnalysis{
             mytraj[i]._type_list = _traj[i].type;
         }
         
+        visualizeCOM();
         _trajobj = new Trajectory(mytraj);
         _bop = new BondOrderParameter(*_trajobj,l);
         _bop->setCalcType(OrderParameter::Calc_t::LOCAL);
-        _bop->setMaxNumberOfNearestNeighbors(12);
+        _bop->setMaxNumberOfNearestNeighbors(6);
         _bop->setRcutOff(4.5);
 
         

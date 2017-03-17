@@ -71,6 +71,16 @@ namespace trajectoryAnalysis {
     }
     
     
+    //make a method that takes this as parameters
+    void ChiralityAnalysis::visualizeCOM(){
+        std::string fn(_filein+"com.xyz");
+        xyz_info _cominfo;
+        _cominfo.type = _logtypeCOM;
+        savexyz(fn.c_str(), _molecular_com, _cominfo);
+
+    }
+    
+    
     int ChiralityAnalysis::_computeMolecularCOM(xyzfile& snap, coord_t* nearest_x){
         int natoms = snap.n;
         assert(natoms%4 == 0);
@@ -84,9 +94,11 @@ namespace trajectoryAnalysis {
         
         coord_t x(3,0.);
         _molecular_com.resize(nmolecules,coord_t(3,0.));
+        _logtypeCOM.resize(nmolecules,"");
         
         
         for (int i=0; i<nmolecules; i++){
+            _logtypeCOM[i] = snap.type[k];
             for (unsigned int j=0;j<4;j++){
                 xl = snap.x[k][0]; yl = snap.x[k][1]; zl = snap.x[k][2];
                 pbc(xl,_box.box_period[0]);
@@ -114,6 +126,7 @@ namespace trajectoryAnalysis {
             
         }
         assert(k = natoms+1);
+        
         return nidx;
     }
     

@@ -22,6 +22,7 @@ namespace trajectoryAnalysis {
         
         void analyze();
         void visualize();
+        void visualizeCOM();
         
     protected:
         double _averageC;
@@ -31,6 +32,8 @@ namespace trajectoryAnalysis {
         std::vector<std::string> _typematch;
         
         coord_list_t _molecular_com;
+        //xyztrajectory_t _trajCOM;
+        std::vector<std::string>   _logtypeCOM;
         
         xyztrajectory_t _traj;
         typelog_t   _logtypes;

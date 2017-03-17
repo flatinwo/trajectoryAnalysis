@@ -615,7 +615,7 @@ namespace trajectoryAnalysis {
         }
         else{
             for (unsigned int i=0; i<n; i++){
-                *os << "H\t" << x[i][0] << "\t" << x[i][1] << "\t" << x[i][2] << "\n";
+                *os << "N\t" << x[i][0] << "\t" << x[i][1] << "\t" << x[i][2] << "\n";
             }
         }
         xyzfile.close();
