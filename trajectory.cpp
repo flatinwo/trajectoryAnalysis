@@ -15,6 +15,7 @@
 #include <fstream>
 #include <sstream>
 #include "io_user_xdr.hpp"
+#include <climits>
 
 namespace trajectoryAnalysis {
     
