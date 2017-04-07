@@ -151,6 +151,12 @@ namespace stats_utils {
             }
             return max;
         }
+
+        int BinContaining(T value){
+		return computeBinContaining(value);
+        }
+ 
+
         
     protected:
         //expands the histogram in the positive x-direction
