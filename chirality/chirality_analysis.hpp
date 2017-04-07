@@ -22,6 +22,7 @@ namespace trajectoryAnalysis {
         
         void analyze();
         void visualize();
+        void visualizeCOM();
         
     protected:
         double _averageC;
@@ -30,12 +31,17 @@ namespace trajectoryAnalysis {
         std::vector<unsigned int> _typecount, _typecountmax;
         std::vector<std::string> _typematch;
         
+        coord_list_t _molecular_com;
+        //xyztrajectory_t _trajCOM;
+        std::vector<std::string>   _logtypeCOM;
+        
         xyztrajectory_t _traj;
         typelog_t   _logtypes;
         Box         _box;
         
         void _initialize();
         void _analyzeChiralityXYZ(xyzfile& snap);
+        int _computeMolecularCOM(xyzfile& snap, coord_t* = nullptr);
         std::string _chiralityunwrap(coord_list_t& x, double& zetad);
         
     };

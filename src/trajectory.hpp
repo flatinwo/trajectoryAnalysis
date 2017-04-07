@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "struct_def.h"
 #include "histogram_dynamic.h"
+#include <utility>
 
 //to do write static_cast, dynamic_cast or something similar for trajectoryAnalysis::xyztrajectory_t to trajectoryAnalysis::trajectory_t
 
@@ -20,6 +21,7 @@ namespace trajectoryAnalysis {
     typedef stats_utils::HistogramDynamic<double> Hist1Dt;
     typedef std::vector< Hist1Dt > Hists1Dt;
     typedef std::vector<Hists1Dt> Hists2Dt;
+    typedef std::pair<bool,unsigned int> Skipt;
     
     class Trajectory{
         
@@ -33,11 +35,11 @@ namespace trajectoryAnalysis {
         Trajectory();
         Trajectory(const char* filename, bool=false, unsigned int i=1, unsigned int=5);
         Trajectory(const char* filename, FILETYPE=GRO, unsigned int i=1, unsigned int=4, unsigned int=50000);
+        Trajectory(trajectory_t&);
         ~Trajectory();
         
         friend Trajectory operator+(const Trajectory& rhs1, const Trajectory& rhs2);
         
-        unsigned int maxCorrelationLength;
         
         int getNumberOfSnaps();
         int getNumberOfFrames();
@@ -51,6 +53,9 @@ namespace trajectoryAnalysis {
         void setVanHoveBinSize(double=0.01);
         void setUseVanHove(bool);
         void setMaxNumberOfFrames(int n);
+        void setUnFolded(bool);
+        void setSkipInfo(Skipt = std::make_pair(true,100),short=2);
+        void setMaxCorrelationLength(unsigned int mcl);
         
         void computeMeanSquaredDisplacement();
         function1d_t computeGofR(double binsize=0.01);
@@ -67,6 +72,8 @@ namespace trajectoryAnalysis {
         bool _useVanHove;
         bool _unfolded;
         bool _computeFskt;
+        short _skipfactor;
+        unsigned int maxCorrelationLength;
         
         
         void computeTimeStep();
@@ -77,7 +84,10 @@ namespace trajectoryAnalysis {
         coord_list_t* _Fskts;
         coord_t* _ks;
         
+        FILETYPE _type;
+        
         Hists2Dt* _vanHovefxn;      //self-part of Van Hove function
+        Skipt* _skipinfo;
     };
 }
 

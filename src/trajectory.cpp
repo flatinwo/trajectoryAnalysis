@@ -20,11 +20,12 @@
 namespace trajectoryAnalysis {
     
 #define TRAJMIN 1
-#define SMALL 0.0001
+#define SMALL 0.0000001
     
     //constructor 1
-    Trajectory::Trajectory():maxCorrelationLength(0),_time_step(100), _unfolded(false){
+    Trajectory::Trajectory():maxCorrelationLength(1),_time_step(100), _unfolded(false){
         _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_maxframes=50000;
+        _skipinfo=_skipinfo=new Skipt(false,1);_skipfactor=2;
     }
     
     //constructor 2
@@ -34,7 +35,8 @@ namespace trajectoryAnalysis {
         _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
         _maxframes=50000;
         
-        _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;
+        _Fskts = nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=_skipinfo=new Skipt(false,1);
+        _skipfactor=2;
 
         //load trajectory
         if (fancy) loadxyzfancy(filename, _trajectory, index, every);
@@ -43,17 +45,39 @@ namespace trajectoryAnalysis {
         //compute time step and maximum correlation length
         computeTimeStep();
         computeMaxCorrelationLength();
+        _type = XYZ;
 
+    }
+    
+    Trajectory::Trajectory(trajectory_t& traj){
+        _type = UNSPECIFIED;
+        _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
+        _maxframes = 50000;_skipfactor=2;
+        
+        
+        _Fskts=nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=new Skipt(false,1);
+        //compute time step and maximum correlation length
+        
+        _trajectory = traj;
+        
+        
+        computeTimeStep();
+        computeMaxCorrelationLength();
+        
+        
     }
     
     Trajectory::Trajectory(const char* filename, FILETYPE type, unsigned int index, unsigned int every, unsigned int maxframes){
         _time_step = 100; _unfolded = false; maxCorrelationLength=0;_computeFskt=false;_k=0;
-        _maxframes = maxframes;
+        _maxframes = maxframes;_skipfactor=2;
         
-        _Fskts=nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;
+        _Fskts=nullptr;_ks=nullptr;_vanHovefxn=nullptr;_useVanHove=false;_skipinfo=new Skipt(false,1);
         
         
-        if (type==GRO) loadgrofancy(filename,_trajectory,index,every);
+        if (type==GRO) {
+            loadgrofancy(filename,_trajectory,index,every);
+            _type = GRO;
+        }
 #ifdef IO_XDR
         else if (type==XTC){
             xdr_info settings;
@@ -61,6 +85,7 @@ namespace trajectoryAnalysis {
             settings.every = every;
             settings.max_frame = _maxframes;
             loadxtc(filename,_trajectory,settings);
+            _type = XTC;
         }
 #endif
         else { std::cerr << "Unknown filetype\n"; exit(-1);}
@@ -78,6 +103,7 @@ namespace trajectoryAnalysis {
         if (_Fskts!=nullptr) delete _Fskts;
         if (_ks !=nullptr) delete _ks;
         if (_vanHovefxn != nullptr) delete _vanHovefxn;
+        if (_skipinfo != nullptr) delete _skipinfo;
     }
     
 #pragma mark GETS
@@ -112,6 +138,14 @@ namespace trajectoryAnalysis {
         
     }
     
+    void Trajectory::setMaxCorrelationLength(unsigned int mcl){
+        assert(mcl > 10);
+        if (3*mcl < _trajectory.size()) maxCorrelationLength = mcl;
+        else std::cerr << "Specified max correlation length is out of range.\n"
+                        << "I will use the max possible value of " << maxCorrelationLength << " .\n"
+                        << "To override choose length <  " << _trajectory.size()/3 << ".\n";
+    }
+    
     void Trajectory::setTimeStep(double dt){
         _time_step = dt;
     }
@@ -119,6 +153,16 @@ namespace trajectoryAnalysis {
     
     void Trajectory::setUseVanHove(bool flag){
         _useVanHove = flag;
+    }
+    
+    void Trajectory::setSkipInfo(Skipt _skip,short sf){
+        if (_skipinfo == nullptr) _skipinfo = new Skipt();
+        _skipinfo->first = _skip.first;
+        _skipinfo->second = _skip.second;
+        _skipfactor = sf;
+        
+        assert(_skipfactor >= 1);
+        assert(_skipinfo->second >= 1);
     }
     
     void Trajectory::setComputeFskt(bool shouldi, double k){
@@ -146,6 +190,10 @@ namespace trajectoryAnalysis {
                                                                  Hists1Dt(maxCorrelationLength)); //this assumes the number of particles remains fixed
         }
         
+    }
+    
+    void Trajectory::setUnFolded(bool flag){
+        _unfolded = flag;
     }
     
     //not yet done
@@ -221,10 +269,12 @@ namespace trajectoryAnalysis {
 
         coord_t dr(3,0.);
         double deltar=0.;
+        //efficient to skip a few frames...
+        //implement at a latter time... log type spacing or add flag for this
         for (unsigned int i=0; i < _trajectory.size(); i++) {
-            for (unsigned int j=1; j < maxCorrelationLength; j++) {
-                if (i+j >= _trajectory.size())
-                    continue;
+            for (unsigned int j=0; j < maxCorrelationLength; j++) {
+                if (i+j >= _trajectory.size()) continue;
+                else if (_skipinfo->first && j > _skipinfo->second && j%_skipfactor != 0) continue; //maybe make skipinfo or struct in case i want a different skip_info
                 else{
                     for (unsigned int l=0; l < _trajectory[i]._center_of_mass_list.size(); l++){
                         deltar=0.;
@@ -237,8 +287,8 @@ namespace trajectoryAnalysis {
                             assert(_Fskts->size()==_ks->size());
                             for (unsigned int f=0; f<_Fskts->size();f++) {
                                 double kdeltar = (*_ks)[f]*sqrt(deltar);
-                                if (kdeltar < SMALL) kdeltar=SMALL;
-                                (*_Fskts)[f][j] += sin(kdeltar)/kdeltar;
+                                if (kdeltar < SMALL) (*_Fskts)[f][j] += 1.0;
+                                else (*_Fskts)[f][j] += sin(kdeltar)/kdeltar;
                             }
                         }
 
@@ -259,7 +309,7 @@ namespace trajectoryAnalysis {
         //normalize Fskt
         if (_computeFskt) {
             for (unsigned int f=0; f<_Fskts->size();f++) {
-                for (unsigned int j=1; j<(*_Fskts)[f].size(); j++) {
+                for (unsigned int j=0; j<(*_Fskts)[f].size(); j++) {
                      (*_Fskts)[f][j] *= (normalization/correlation[j].first);
                 }
             }
@@ -377,14 +427,15 @@ namespace trajectoryAnalysis {
             exit(-1);
         }
         
-        if (dstep == 1.) dstep = _trajectory[1].timestep - _trajectory[0].timestep;
+        if (dstep == 1.|| _type == XTC) dstep = _trajectory[1].timestep - _trajectory[0].timestep;
         if (dstep <= 0.) dstep=1.;
         
         for (unsigned int i=0; i<_Fskts->size(); i++) {
             std::string str="Fskt"+ std::to_string((*_ks)[i])+".dat";
             std::ofstream myfile(str.c_str());
-            for (unsigned int j=1; j< (*_Fskts)[i].size() && j < maxCorrelationLength; j++) {
-                myfile << dstep*_time_step*(j-1) << "\t" << (*_Fskts)[i][j]/((*_Fskts)[i][1]) << std::endl;
+            for (unsigned int j=0; j< (*_Fskts)[i].size() && j < maxCorrelationLength; j++) {
+                if (_skipinfo->first && j > _skipinfo->second && j%_skipfactor != 0) continue;
+                myfile << dstep*_time_step*(j) << "\t" << (*_Fskts)[i][j] << std::endl;
             }
             myfile.close();
         }

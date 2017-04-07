@@ -17,6 +17,8 @@
 
 namespace trajectoryAnalysis {
     
+    //type based bond order parameter, perhaps do this using a map data structure.
+    
     /**
      \brief A derived class to perform specific calculations on/for Steinhardt bond order parameters
      */
@@ -31,6 +33,11 @@ namespace trajectoryAnalysis {
         
         double getQl();
         double getWl();
+        double getqli(int i=0){ return _qli[i];};
+        double getwli(int i=0){ return _wli[i];};
+        int getL(){return _l;};
+        
+        
         void print();
         
         void addLvalue(int);

@@ -63,8 +63,8 @@ namespace trajectoryAnalysis {
     }
     
     void BondOrderParameter::setLvalue(int l){
-        assert(l>1);
-        _l = l;
+        assert(0);
+        //_l = l;
     }
     
     

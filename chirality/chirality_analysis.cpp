@@ -9,6 +9,7 @@
 #include "chirality_analysis.hpp"
 #include "spatial.hpp"
 #include <algorithm>
+#include <limits>
 
 namespace trajectoryAnalysis {
     ChiralityAnalysis::ChiralityAnalysis(int argc, const char* argv[]){
@@ -69,6 +70,65 @@ namespace trajectoryAnalysis {
         chiral.visualize(_traj);
     }
     
+    
+    //make a method that takes this as parameters
+    void ChiralityAnalysis::visualizeCOM(){
+        std::string fn(_filein+"com.xyz");
+        xyz_info _cominfo;
+        _cominfo.type = _logtypeCOM;
+        savexyz(fn.c_str(), _molecular_com, _cominfo);
+
+    }
+    
+    
+    int ChiralityAnalysis::_computeMolecularCOM(xyzfile& snap, coord_t* nearest_x){
+        int natoms = snap.n;
+        assert(natoms%4 == 0);
+        int nmolecules = natoms/4;
+        unsigned int k,l,m;
+        double xl,yl,zl;
+        k=l=m=0;
+        
+        int nidx=-1;
+        double min = std::numeric_limits<double>::max();
+        
+        coord_t x(3,0.);
+        _molecular_com.resize(nmolecules,coord_t(3,0.));
+        _logtypeCOM.resize(nmolecules,"");
+        
+        
+        for (int i=0; i<nmolecules; i++){
+            _logtypeCOM[i] = snap.type[k];
+            for (unsigned int j=0;j<4;j++){
+                xl = snap.x[k][0]; yl = snap.x[k][1]; zl = snap.x[k][2];
+                pbc(xl,_box.box_period[0]);
+                pbc(yl,_box.box_period[1]);
+                pbc(zl,_box.box_period[2]);
+                
+                x[0] += xl;
+                x[1] += yl;
+                x[2] += zl;
+                k++;
+            }
+            for (unsigned int l=0;l<3;l++) {
+                _molecular_com[i][l] = x[l]/4;
+            }
+            
+            if (nearest_x != nullptr){
+                double rsq = distancesq(_molecular_com[i], *nearest_x);
+                if ( rsq < min) {
+                    nidx = i;
+                    min =rsq;
+                }
+            }
+            
+            x[0]=x[1]=x[2]=0;
+            
+        }
+        assert(k = natoms+1);
+        
+        return nidx;
+    }
     
     void ChiralityAnalysis::_analyzeChiralityXYZ(xyzfile& snap){
         int natoms = snap.n;

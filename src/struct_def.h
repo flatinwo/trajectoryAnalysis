@@ -18,7 +18,7 @@
 namespace trajectoryAnalysis {
     
     typedef std::vector<double> coord_t;
-    typedef std::vector<bool> bool_list_t;
+    typedef std::vector<bool> bool_list_t; //people say this is bad
     typedef std::vector<coord_t> coord_list_t;
     typedef std::vector<unsigned int>  unsigned_list_t;
     
@@ -43,7 +43,7 @@ namespace trajectoryAnalysis {
     
     typedef std::map<std::string, unsigned int> typelog_t;
     
-    enum FILETYPE {XYZ=0,GRO=1,XTC=2};
+    enum FILETYPE {XYZ=0,GRO=1,XTC=2,UNSPECIFIED=3};
     
     
     //overloaded operators
