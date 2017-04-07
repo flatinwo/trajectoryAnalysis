@@ -45,7 +45,7 @@ struct TestBondOrderChiralityAnalysis : public testing::Test{
 }*/
 
 TEST_F(TestBondOrderChiralityAnalysis,SetUp){
-    const char* fn = "/Users/Folarin/Documents/cplusplustutor/ladapo_test/Latinwo_tests/trajectoryAnalysis/trajectoryAnalysis/UnitTests/data/mylattice.xyz";
+    const char* fn = "/Users/Folarin/Documents/cplusplustutor/ladapo_test/Latinwo_tests/trajectoryAnalysis/trajectoryAnalysis/UnitTests/data/racemic_best22.xyz";
     
     tbox.box_hi = coord_t(3,100.);
     tbox.updatePeriod();

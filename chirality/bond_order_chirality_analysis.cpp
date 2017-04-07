@@ -36,16 +36,24 @@ namespace trajectoryAnalysis{
         
     }
     
+    void BondOrderChiralityAnalysis::setMaxNumberOfNeighbors(int n){
+        _bop->setMaxNumberOfNearestNeighbors(n);
+    };
+    
+    void BondOrderChiralityAnalysis::setRcutOff(double r){
+        _bop->setRcutOff(r);
+    };
+    
     BondOrderChiralityAnalysis::~BondOrderChiralityAnalysis(){
         delete _bop;
         delete _trajobj;
     }
     
-    void BondOrderChiralityAnalysis::computeBOP(){
+    void BondOrderChiralityAnalysis::computeBOP(std::ostream& os){
         _bop->compute();
         _bop->print();
-        
-        std::cout << _idx << "\t"
+
+        os << _idx << "\t" << _bop->getL() << "\t"
                 << _bop->getqli(_idx) <<"\t"
                 << _bop->getwli(_idx) << "\n";
     }

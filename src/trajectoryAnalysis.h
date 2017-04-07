@@ -28,5 +28,7 @@
 #include "averaged_tetrahedral_order_parameter.hpp"
 #include "local_structure_index.hpp"
 #include "io_user_xdr.hpp"
+#include "structure_chirality_analysis.hpp"
+#include "bond_order_chirality_analysis.hpp"
 
 #endif /* trajectoryAnalysis_h */

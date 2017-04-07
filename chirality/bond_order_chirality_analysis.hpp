@@ -13,6 +13,7 @@
 #include "chirality_analysis.hpp"
 #include "bond_order_parameter.hpp"
 #include <array>
+#include <fstream>
 
 namespace trajectoryAnalysis{
     class BondOrderChiralityAnalysis : public ChiralityAnalysis{
@@ -22,7 +23,10 @@ namespace trajectoryAnalysis{
         ~BondOrderChiralityAnalysis();
         
         void refresh();
-        void computeBOP();
+        void computeBOP(std::ostream& = std::cout);
+        
+        void setMaxNumberOfNeighbors(int);
+        void setRcutOff(double);
         
     protected:
         
