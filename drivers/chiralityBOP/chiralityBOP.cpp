@@ -18,7 +18,7 @@ using namespace trajectoryAnalysis;
 int main(int argc, const char * argv[]) {
 
     if (argc != 3){
-        std::cout << "Usage:\n" << argv[0] << "\tfilename (char)\tl-value (int)\n";
+        std::cout << "Usage:\n" << argv[0] << "\tfilename [char]\tl-value [int]\n";
         exit(-1);
     }
     std::string str(argv[1]);
