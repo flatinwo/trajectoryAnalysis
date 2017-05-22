@@ -29,7 +29,7 @@ int main(int argc, const char * argv[]) {
     tbox.box_hi = coord_t(3,100.);
     tbox.updatePeriod();
     
-    std::ofstream output("chirality_bop.txt");
+    std::ofstream output("chirality_bop.txt",std::ofstream::app | std::ofstream::out);
     
     BondOrderChiralityAnalysis boca(str.c_str(),tbox,l,true);
     boca.computeBOP(output);
