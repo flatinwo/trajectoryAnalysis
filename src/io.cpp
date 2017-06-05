@@ -251,14 +251,24 @@ namespace trajectoryAnalysis {
                 }
                 
                 //it is iterator
-                for (auto it=box.box_hi.rbegin(); it != box.box_hi.rend(); ++it) {
-                    *it = std::stod(text.top());
-                    text.pop();
+                try {
+                    for (auto it=box.box_hi.rbegin(); it != box.box_hi.rend(); ++it) {
+                        *it = std::stod(text.top());
+                        text.pop();
+                    }
+                    text.pop(); text.pop();
+                    system[nsnap].timestep = std::stoi(text.top());
+                } catch (...) {
+                    std::cerr << "Unable to update box\n";
+                    system[nsnap].timestep = 0;
                 }
-                //update to compute period
+                
+                
+
+
+                
                 box.updatePeriod();
-                text.pop(); text.pop();
-                system[nsnap].timestep = std::stoi(text.top());
+
                 
                 coord_list_t x;
                 info->type.clear();

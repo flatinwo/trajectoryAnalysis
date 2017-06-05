@@ -195,7 +195,7 @@ namespace stats_utils {
         
         enum {TOO_SMALL = -2, TOO_BIG = -1};
         bool _is_firsttime;
-        bool _to_normalize;
+        bool _to_normalize=false;
     };
     
     template <class TYPE>

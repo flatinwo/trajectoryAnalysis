@@ -255,6 +255,32 @@ namespace trajectoryAnalysis {
     }
     
     
+    
+    Hist1Dt Trajectory::computeNeighborDistribution(short ind, double binsize){
+        
+        assert(ind < _trajectory[0]._center_of_mass_list.size());
+        assert(ind > -1);
+        
+        Hist1Dt neighbordist;
+        neighbordist.setBinSize(binsize);
+        neighbordist.insert(0.,0.);
+        
+        for (unsigned int i=0; i<_trajectory.size(); i++){
+            coord_list_t* mylist = &(_trajectory[i]._center_of_mass_list);
+            for (unsigned int m=0; m < mylist->size(); m++){
+                
+                if (ind == m) continue;
+                
+                double r = distance((*mylist)[m],
+                                    (*mylist)[ind],
+                                    _trajectory[i].box);
+                neighbordist.insert(r);
+            }
+        }
+        
+        return neighbordist;
+    }
+    
     void Trajectory::computeMeanSquaredDisplacement(){
         
         if (_unfolded != true)

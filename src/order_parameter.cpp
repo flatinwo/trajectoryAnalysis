@@ -27,6 +27,8 @@
 //an alternative would be to load using multidimensional library in boost
 //use R as library to CPP package
 
+//use try catch block for cases where the number of neighbors is large
+
 using namespace boost::accumulators;
 
 namespace trajectoryAnalysis {

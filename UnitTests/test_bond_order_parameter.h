@@ -46,12 +46,12 @@ TEST_F(TestBondOrderParameter,FCC){
     traj.reset(new Trajectory(fn,true,1,1));
     
     //testing 6th order bops
-    tBOP bop = compute(6);
+    tBOP bop = compute(6,0,12);
     EXPECT_NEAR(bop.Q,0.57452,0.0001);
     EXPECT_NEAR(bop.W,-0.013161,0.0001);
     
     //testing 4th order bops
-    bop = compute(4);
+    bop = compute(4,0,12);
     EXPECT_NEAR(bop.Q,0.19094,0.0001);
     EXPECT_NEAR(bop.W,-0.159317,0.0001);
 }
@@ -64,12 +64,12 @@ TEST_F(TestBondOrderParameter,HCP){
     traj.reset(new Trajectory(fn,true,1,1));
     
     //testing 6th order bops
-    tBOP bop = compute(6);
+    tBOP bop = compute(6,0,12);
     EXPECT_NEAR(bop.Q,0.48476,0.0001);
     EXPECT_NEAR(bop.W,-0.012442,0.0001);
     
     //testing 4th order bops
-    bop = compute(4);
+    bop = compute(4,0,12);
     EXPECT_NEAR(bop.Q,0.09722,0.0001);
     EXPECT_NEAR(bop.W,0.134097,0.0001);
 }
@@ -112,6 +112,7 @@ TEST_F(TestBondOrderParameter,SC){
     EXPECT_NEAR(bop.W,0.159317,0.0001); // it appears W4 is not zero
     
 }
+
 
 /*TEST_F(TestBondOrderParameter,OTHER){
     const char* fn = "/Users/Folarin/Documents/cplusplustutor/ladapo_test/Latinwo_tests/trajectoryAnalysis/trajectoryAnalysis/UnitTests/data/tg_7.xyz";

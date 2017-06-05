@@ -68,8 +68,8 @@ namespace trajectoryAnalysis {
         
         Box():
         box_lo(3,0.0),
-        box_hi(3,10.0),
-        box_period(3,10.0),
+        box_hi(3,500.0),
+        box_period(3,500.0),
         periodic(3,true)
         {}
         

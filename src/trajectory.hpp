@@ -59,7 +59,7 @@ namespace trajectoryAnalysis {
         
         void computeMeanSquaredDisplacement();
         function1d_t computeGofR(double binsize=0.01);
-        Hist1Dt computeNeighborDistribution();
+        Hist1Dt computeNeighborDistribution(short ind, double binsize=0.05);
         
         void printFskt(double=1.);
         
